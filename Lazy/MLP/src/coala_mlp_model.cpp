@@ -1,5 +1,5 @@
 #include "coala_mlp_model.h"
-
+#include "coala_mlp_loss.h"
 
 
 CoalaMlpModel::CoalaMlpModel(int input_size, int hidden_layers_count=1, int hidden_layers_output_size=5, int output_size=1, float learning_rate=0.01f)
@@ -83,5 +83,29 @@ void CoalaMlpModel::forward(float * input, int examples)
     }
     this->output_layer->forward(this->hidden_layers[this->hidden_layers_count-1]->getOutput(), examples);
     this->trained_times++;
+    return;
+}
+
+float CoalaMlpModel::cost(float * VecPred, float * VecReal, int dim)
+{
+    return coala_mlp_smse(VecPred, VecReal, dim);
+}
+
+
+void CoalaMlpModel::backward(float * input, float * output)
+{
+    // this->output_layer->backward(this->hidden_layers[this->hidden_layers_count-1]->getOutput(), output);
+    // for(int i=this->hidden_layers_count-1; i>=0; i--)
+    // {
+    //     if(i==0)
+    //     {
+    //         this->hidden_layers[i]->backward(this->input_layer->getOutput(), this->output_layer->getInputGradient());
+    //     }
+    //     else
+    //     {
+    //         this->hidden_layers[i]->backward(this->hidden_layers[i-1]->getOutput(), this->hidden_layers[i+1]->getInputGradient());
+    //     }
+    // }
+    // this->input_layer->backward(input, this->hidden_layers[0]->getInputGradient());
     return;
 }

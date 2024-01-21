@@ -29,7 +29,8 @@ class CoalaMlpModel
     std::shared_ptr<CoalaMlpOutputLayer>  output_layer;                 //< The output layer of the model.
     float learning_rate;                           //< The learning rate for weight updates.
     int trained_times;                          //< The number of times the model has been trained.
-    
+    float loss;                                 //< The loss of the model.
+
     public:
     CoalaMlpModel(int input_size, int hidden_layers_count=1, int hidden_layers_output_size=5, int output_size=1, float learning_rate=0.01f);
     
@@ -47,6 +48,10 @@ class CoalaMlpModel
      */
     void forward(float* input, int examples);
     
+    float cost(float * VecPred, float * VecReal, int dim);
+
+
+
     /**
      * @brief Performs backward propagation for the model.
      * 

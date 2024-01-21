@@ -144,7 +144,7 @@ class CoalaMlpOutputLayer
     CoalaMlpOutputLayer(int input_size, int output_size);
     int setInputSize(int input_size);
     int setActivation(COALA_MLP_ACTIVATION activation_rank);
-
+    float * getOutput();
     void initializeWeights(COALA_MLP_INITIALIZATION initialization_rank);
 
     /**
@@ -161,7 +161,7 @@ class CoalaMlpOutputLayer
      * @param input The input to the layer.
      * @param output The output of the layer.
      */
-    void backward(float* input, float* output);
+    void backward(float * real, int examples);
 
     /**
      * @brief Updates the weights and biases of the layer using the specified learning rate.

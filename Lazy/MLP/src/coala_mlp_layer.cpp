@@ -162,6 +162,11 @@ void CoalaMlpHiddenLayer::forward(float * input, int examples)
 }
 
 
+void CoalaMlpHiddenLayer::backward(float* input, float* output)
+{
+    return;
+}
+
 //----------------------------------------------------------------------------------------------
 // CoalaMlpOutputLayer
 //----------------------------------------------------------------------------------------------
@@ -284,4 +289,28 @@ void CoalaMlpOutputLayer::forward(float * input, int examples)
     }
 
     this->trained_times++;
+}
+
+float *  CoalaMlpOutputLayer::getOutput()
+{
+    return this->output;
+}
+
+void CoalaMlpOutputLayer::backward(float * real, int examples)
+{
+    // i is the example index
+    // MSE = 1/N * sum{ (y_pred_i - y_real_i)^2 }
+    // dMSE/dy_pred_i = 2*(y_pred_i - y_real_i)/N
+
+    // Sigmoid:
+    // y_pred_i = 1/( 1+e^(-z_i) )
+    // dSigmoid/dz = Sigmoid * (1-Sigmoid) = y_pred_i * (1-y_pred_i)
+
+    // z = X_i * W_i + B_i
+    // dz/dW = X
+    // dz/dB = 1
+
+    // dMSE/dW = sum{ dMSE/dy_pred_i * dy_pred_i/dz_i * dz_i/dW } / N
+
+    return;
 }
