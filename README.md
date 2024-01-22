@@ -55,7 +55,7 @@ make -j 4
 ## Testing
 The test examples are in the 'Test' folder.
 
-Just in case some environments from being configured in time, here is a functional verification DEMO that can be used for convenient testing
+In the event that certain environments may not be ready in time, we have prepared a functional verification DEMO for convenient and easy testing.
 ```bash
 cd Test && cd Demo
 make xdemo

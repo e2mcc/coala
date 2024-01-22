@@ -9,7 +9,7 @@ cublasStatus_t cublasCreate(cublasHandle_t * handle)
 
 cublasStatus_t cublasSetMatrix (int M, int N, int size, float * A, int ldA, float * devPtrA, int ldPtrA)
 {
-    // printf("Here in cublasSetMatrix\n"); 
+    // printf("Here in cublasSetMatrix\n");    
     return CUBLAS_STATUS_SUCCESS;
 }
 
