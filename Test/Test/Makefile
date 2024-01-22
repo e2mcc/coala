@@ -11,20 +11,18 @@ CFLAGS = -Wall -Wno-unused-result -Wno-unknown-pragmas -Wfatal-errors -fPIC
 
 
 # OpenCL headfile
-# ClBlastDir = /home/user/lsl/CLBlast
-ClBlastDir = /home/cqy/CLBlast-master
+ClBlastDir = 
 ClBlastInc = $(ClBlastDir)/include
 ClBlastLib = -Wl,-rpath,$(ClBlastDir)/build -L$(ClBlastDir)/build  $(ClBlastDir)/build/libclblast.so
 
 # OpenBlas
-# OpenBlasDir = /home/user/lsl/OpenBLAS-develop
-OpenBlasDir = /home/cqy/OpenBLAS
+OpenBlasDir = 
 OpenBlasInc = $(OpenBlasDir)
 OpenBlasLib = $(OpenBlasDir)/libopenblas.a
 
 
 #cublas in A100 server
-CuBlasDir = /usr/local/cuda-11.2/targets/x86_64-linux
+CuBlasDir = 
 CuBlasInc = $(CuBlasDir)/include
 CuBlasLib = $(CuBlasDir)/lib/libcublas_static.a
 
