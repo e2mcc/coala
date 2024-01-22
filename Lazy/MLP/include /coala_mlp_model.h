@@ -11,9 +11,8 @@
 #include <cstring>
 #include <vector>
 
-
 //----------------------------------------------------------------------------------------------
-// Classes
+// Class
 //----------------------------------------------------------------------------------------------
 class CoalaMlpModel
 {
@@ -21,52 +20,38 @@ class CoalaMlpModel
     CoalaMlpModel(){}
 
     private:
-    int input_size;                             //< The size of the input to the model.
-    int hidden_layers_count;                    //< The number of hidden layers in the model.
-    int output_size;                            //< The size of the output from the model.
-    std::shared_ptr<CoalaMlpInputLayer>  input_layer;                   //< The input layer of the model.
-    std::vector<std::shared_ptr<CoalaMlpHiddenLayer>> hidden_layers;    //< The hidden layers of the model.
-    std::shared_ptr<CoalaMlpOutputLayer>  output_layer;                 //< The output layer of the model.
-    float learning_rate;                           //< The learning rate for weight updates.
-    int trained_times;                          //< The number of times the model has been trained.
-    float loss;                                 //< The loss of the model.
+    //Input Layer
+    std::shared_ptr<CoalaMlpInputLayer>  input_layer;
+
+    //Hidden Layer
+    int hidden_layers_count;
+    std::vector<std::shared_ptr<CoalaMlpHiddenLayer>> hidden_layers;
+
+    //Output Layer
+    std::shared_ptr<CoalaMlpOutputLayer>  output_layer;
+    
+    
+    float learning_rate;
+    int trained_times;
+    float loss;
 
     public:
-    CoalaMlpModel(int input_size, int hidden_layers_count=1, int hidden_layers_output_size=5, int output_size=1, float learning_rate=0.01f);
+    CoalaMlpModel(int input_layer_neurons, int hidden_layers_count=1, int hidden_layers_neurons=5, int output_layer_neurons=1, float learning_rate=0.01f);
     
     int setHiddenLayer(int hidden_layer_rank, COALA_MLP_ACTIVATION activation_rank, int output_size);
     int setOutputLayerActivation(COALA_MLP_ACTIVATION activation_rank);
 
-
     void initializeWeights(COALA_MLP_INITIALIZATION initialization_rank);
 
-    /**
-     * @brief Performs forward propagation for the model.
-     * 
-     * @param input The input to the model.
-     * @param output The output of the model.
-     */
-    void forward(float* input, int examples);
+    void forward(float* Mat, int examples, int features);
     
     float cost(float * VecPred, float * VecReal, int dim);
 
-
-
-    /**
-     * @brief Performs backward propagation for the model.
-     * 
-     * @param input The input to the model.
-     * @param output The output of the model.
-     */
     void backward(float* input, float* output);
 
-    /**
-     * @brief Updates the weights and biases of the model using the specified learning rate.
-     * 
-     * @param learning_rate The learning rate for weight updates.
-     */
     void update(float learning_rate);
-};
 
+    void saveToFile(std::string filename);
+};
 
 #endif // COALA_MLP_MODEL_H

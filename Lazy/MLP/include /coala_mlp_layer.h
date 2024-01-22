@@ -20,15 +20,15 @@ class CoalaMlpInputLayer
     private:
     float * input;
     float * output;                 //< The input features to the layer.
-    int input_output_size;         //< The size of the input.
+    int neurons;         //< The size of the input.
 
     public:
     /**
      * @brief Constructs a CoalaMlpInputLayer object with the specified input and output sizes.
      * 
-     * @param input_output_size The size of the input and output to the layer.
+     * @param neurons The number of the features withnin the input.
      */
-    CoalaMlpInputLayer(int input_output_size);
+    CoalaMlpInputLayer(int neurons);
     
     /**
      * @brief Performs forward propagation for the layer.
@@ -36,8 +36,8 @@ class CoalaMlpInputLayer
      * @param input The input to the layer.
      * @param output The output of the layer.
      */
-    void forward(float * input, int examples);
-
+    void forward(float * mat, int examples, int features);
+    int getNeuronsNum();
     float * getOutput();
     
     /**
@@ -71,6 +71,8 @@ class CoalaMlpHiddenLayer
     CoalaMlpHiddenLayer(){}
 
     private:
+    int features;               //< The size of the input.
+    int neurons;                //< The size of the output.
     float * weights;             //< The weights of the layer.
     float * biases;              //< The biases of the layer.
     float * weights_gradient;    //< The gradients of the weights.
@@ -79,8 +81,6 @@ class CoalaMlpHiddenLayer
     float * output;              //< The output of the layer.
     float * input_gradient;      //< The gradients of the input.
     float * output_gradient;     //< The gradients of the output.
-    int input_size;             //< The size of the input.
-    int output_size;            //< The size of the output.
     int activation_function;    //< The activation function of the layer.
     int trained_times;          //< The number of times the layer has been trained.
 
@@ -91,12 +91,15 @@ class CoalaMlpHiddenLayer
      * @param input_size The size of the input to the layer.
      * @param output_size The size of the output from the layer.
      */
-    CoalaMlpHiddenLayer(int input_size, int output_size);
+    CoalaMlpHiddenLayer(int features, int neurons);
     int setInputSize(int input_size);
+    int getInputSize();
     int setOutputSize(int output_size);
     int getOutputSize();
     int setActivation(COALA_MLP_ACTIVATION activation_rank);
-    
+    int getActivation();
+    float * getWeights();
+    float * getBiases();
 
     void initializeWeights(COALA_MLP_INITIALIZATION initialization_rank);
 
@@ -126,11 +129,12 @@ class CoalaMlpOutputLayer
     float * weights_gradient;    //< The gradients of the weights.
     float * biases_gradient;     //< The gradients of the biases.
     float * input;               //< The input to the layer.
-    float * output;              //< The output of the layer.
-    float * input_gradient;      //< The gradients of the input.
-    float * output_gradient;     //< The gradients of the output.
-    int input_size;           //< The size of the input.
-    int output_size;          //< The size of the output.
+    float * output_z;              //the output of the layer before activation
+    float * output_y;              //< The output of the layer.
+    float * dloss2dy;      //< The gradients of the input.
+    float * dy2dz;     //< The gradients of the output.
+    int features;           //< The size of the input.
+    int neurons;          //< The size of the output.
     int activation_function;    //< The activation function of the layer.
     int trained_times;          //< The number of times the layer has been trained.
     
@@ -138,13 +142,18 @@ class CoalaMlpOutputLayer
     /**
      * @brief Constructs a CoalaMlpOutputLayer object with the specified input and output sizes.
      * 
-     * @param input_size The size of the input to the layer.
+     * @param features The size of the input to the layer.
      * @param output_size The size of the output from the layer.
      */
-    CoalaMlpOutputLayer(int input_size, int output_size);
+    CoalaMlpOutputLayer(int features, int neurons);
     int setInputSize(int input_size);
+    int getFeaturesNum();
     int setActivation(COALA_MLP_ACTIVATION activation_rank);
+    int getActivation();
     float * getOutput();
+    int getNeuronsNum();
+    float * getWeights();
+    float * getBiases();
     void initializeWeights(COALA_MLP_INITIALIZATION initialization_rank);
 
     /**
@@ -161,7 +170,7 @@ class CoalaMlpOutputLayer
      * @param input The input to the layer.
      * @param output The output of the layer.
      */
-    void backward(float * real, int examples);
+    void backward(float * real_mat, int examples, int real_dim);
 
     /**
      * @brief Updates the weights and biases of the layer using the specified learning rate.

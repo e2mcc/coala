@@ -1,31 +1,29 @@
 #include "coala_mlp_model.h"
 #include "coala_mlp_loss.h"
+#include <string>
 
-
-CoalaMlpModel::CoalaMlpModel(int input_size, int hidden_layers_count=1, int hidden_layers_output_size=5, int output_size=1, float learning_rate=0.01f)
+CoalaMlpModel::CoalaMlpModel(int input_layer_neurons, int hidden_layers_count=1, int hidden_layers_neurons=5, int output_layer_neurons=1, float learning_rate=0.01f)
 {
-    this->input_size = input_size;
-    this->output_size = output_size;
     this->hidden_layers_count = hidden_layers_count;
     this->learning_rate = learning_rate;
 
-    this->input_layer = std::make_shared<CoalaMlpInputLayer>(input_size);
+    this->input_layer = std::make_shared<CoalaMlpInputLayer>(input_layer_neurons);
    
     this->hidden_layers = std::vector<std::shared_ptr<CoalaMlpHiddenLayer>>(hidden_layers_count);
     for(int i=0; i<hidden_layers_count; i++)
     {
         if(i==0)
         {
-            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(input_size, hidden_layers_output_size);
+            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(input_layer_neurons,hidden_layers_neurons);
         }
         else
         {
-            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(hidden_layers_output_size, hidden_layers_output_size);
+            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(output_layer_neurons,hidden_layers_neurons);
         }
         this->hidden_layers[i]->setActivation(COALA_MLP_ACTIVATION_RELU);
     }
 
-    this->output_layer = std::make_shared<CoalaMlpOutputLayer>(hidden_layers_output_size, output_size);
+    this->output_layer = std::make_shared<CoalaMlpOutputLayer>(hidden_layers_neurons, output_layer_neurons);
     this->output_layer->setActivation(COALA_MLP_ACTIVATION_SIGMOID);
 }
 
@@ -67,9 +65,9 @@ void CoalaMlpModel::initializeWeights(COALA_MLP_INITIALIZATION initialization_ra
 }
 
 
-void CoalaMlpModel::forward(float * input, int examples)
+void CoalaMlpModel::forward(float* mat, int examples, int features)
 {
-    this->input_layer->forward(input, examples);
+    this->input_layer->forward(mat, examples, features);
     for(int i=0; i<this->hidden_layers_count; i++)
     {
         if(i==0)
@@ -94,18 +92,76 @@ float CoalaMlpModel::cost(float * VecPred, float * VecReal, int dim)
 
 void CoalaMlpModel::backward(float * input, float * output)
 {
-    // this->output_layer->backward(this->hidden_layers[this->hidden_layers_count-1]->getOutput(), output);
-    // for(int i=this->hidden_layers_count-1; i>=0; i--)
-    // {
-    //     if(i==0)
-    //     {
-    //         this->hidden_layers[i]->backward(this->input_layer->getOutput(), this->output_layer->getInputGradient());
-    //     }
-    //     else
-    //     {
-    //         this->hidden_layers[i]->backward(this->hidden_layers[i-1]->getOutput(), this->hidden_layers[i+1]->getInputGradient());
-    //     }
-    // }
-    // this->input_layer->backward(input, this->hidden_layers[0]->getInputGradient());
+    
+    return;
+}
+
+
+
+void CoalaMlpModel::update(float learning_rate)
+{
+    this->input_layer->update(learning_rate);
+    for(int i=0; i<this->hidden_layers_count; i++)
+    {
+        this->hidden_layers[i]->update(learning_rate);
+    }
+    this->output_layer->update(learning_rate);
+    return;
+}
+
+void CoalaMlpModel::saveToFile(std::string filename)
+{
+    //打开文件
+    FILE *fp = fopen(filename.c_str(), "w");
+    
+    //文件首先保存模型层数数据
+    fprintf(fp, "1 %d 1\n", this->hidden_layers_count);
+    //每层用7个%分割
+    fprintf(fp, "%%%%%%%%");
+    //文件然后保存模型输入层神经元数
+    fprintf(fp, "%d\n", this->input_layer->getNeuronsNum());
+    //每层用7个%分割
+    fprintf(fp, "%%%%%%%%\n");
+    //文件其次开始保存模型隐藏层数据
+    for(int i=0; i<this->hidden_layers_count; i++)
+    {
+        fprintf(fp, "%d %d %d\n", this->hidden_layers[i]->getInputSize(), this->hidden_layers[i]->getOutputSize(), this->hidden_layers[i]->getActivation());
+        for(int j=0; j<this->hidden_layers[i]->getOutputSize(); j++)
+        {
+            for(int k=0; k<this->hidden_layers[i]->getInputSize(); k++)
+            {
+                fprintf(fp, "%f ", this->hidden_layers[i]->getWeights()[j*this->hidden_layers[i]->getInputSize()+k]);
+            }
+            fprintf(fp, "\n");
+        }
+        for(int j=0; j<this->hidden_layers[i]->getOutputSize(); j++)
+        {
+            fprintf(fp, "%f ", this->hidden_layers[i]->getBiases()[j]);
+        }
+        fprintf(fp, "\n");
+        //每层用7个%分割
+        fprintf(fp, "%%%%%%%%\n");
+    }
+
+    //文件最后开始保存模型输出层数据
+    fprintf(fp, "%d %d %d\n", this->output_layer->getFeaturesNum(), this->output_layer->getNeuronsNum(),this->output_layer->getActivation());
+    for(int j=0; j<this->output_layer->getNeuronsNum(); j++)
+    {
+        for(int k=0; k<this->output_layer->getFeaturesNum(); k++)
+        {
+            fprintf(fp, "%f ", this->output_layer->getWeights()[j*this->output_layer->getFeaturesNum()+k]);
+        }
+        fprintf(fp, "\n");
+    }
+    for(int j=0; j<this->output_layer->getNeuronsNum(); j++)
+    {
+        fprintf(fp, "%f ", this->output_layer->getBiases()[j]);
+    }
+    fprintf(fp, "\n");
+
+
+    //关闭文件
+    fclose(fp);
+    
     return;
 }
