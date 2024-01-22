@@ -29,8 +29,11 @@ int coala_blas_sgemm
     cublasHandle_t handle;
     #endif
     
+    #ifdef COALA_MLP_PREDICT
+    probelist->probes[taskid].optimalR = modelPredictSGemm(m,n,k);
+    #endif
 
-    //TODO: 这里还需要考虑转置的问题
+    //TODO: 这里还需要考虑到多种转置的问题
     int errcode;
     switch (probelist->probes[taskid].optimalR)
     {
@@ -45,7 +48,7 @@ int coala_blas_sgemm
             return errcode;
         #endif
 
-        #ifdef COALA_ENABLE_OPENCL
+        #ifdef COALA_ENABLE_CLBLAST
         case 2:
             return 0;
         #endif
