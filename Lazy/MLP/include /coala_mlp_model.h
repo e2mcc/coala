@@ -47,7 +47,7 @@ class CoalaMlpModel
     
     float cost(float * VecPred, float * VecReal, int dim);
 
-    void backward(float* input, float* output);
+    void backward(float * real_mat, int examples, int real_dim);
 
     void update(float learning_rate);
 

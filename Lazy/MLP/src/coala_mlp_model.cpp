@@ -90,12 +90,17 @@ float CoalaMlpModel::cost(float * VecPred, float * VecReal, int dim)
 }
 
 
-void CoalaMlpModel::backward(float * input, float * output)
+void CoalaMlpModel::backward(float * real_mat, int examples, int real_dim)
 {
-    
+    this->output_layer->backward(real_mat, examples, real_dim);
+    for(int i=this->hidden_layers_count-1; i>=0; i--)
+    {
+       
+        this->hidden_layers[i]->backward();
+    }
+    this->input_layer->backward();
     return;
 }
-
 
 
 void CoalaMlpModel::update(float learning_rate)

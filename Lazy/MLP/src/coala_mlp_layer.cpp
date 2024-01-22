@@ -188,7 +188,7 @@ void CoalaMlpHiddenLayer::forward(float * input, int examples)
 }
 
 
-void CoalaMlpHiddenLayer::backward(float* input, float* output)
+void CoalaMlpHiddenLayer::backward()
 {
     return;
 }

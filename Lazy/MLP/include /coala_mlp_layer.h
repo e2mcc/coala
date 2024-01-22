@@ -107,7 +107,7 @@ class CoalaMlpHiddenLayer
     
     float * getOutput();
 
-    void backward(float* input, float* output);
+    void backward();
 
     void update(float learning_rate);
 };
