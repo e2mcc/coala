@@ -53,9 +53,12 @@ make -j 4
 ```
 
 ## Testing
-The test examples are in the Test folder.
+The test examples are in the 'Test' folder.
+
+Just in case some environments from being configured in time, here is a functional verification DEMO that can be used for convenient testing
 ```bash
-cd Test
+cd Test && cd Demo
 make xdemo
+./xdemo 3 4 5
 ```
 
