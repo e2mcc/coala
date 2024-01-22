@@ -5,6 +5,11 @@
 #include <cublas_v2.h>
 #endif
 
+#ifdef COALA_ENABLE_CLBLAST
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS 
+#include <clblast_c.h>
+#endif
+
 int coala_blas_dgemm
 (   
     coala_probelist_t * probelist,
@@ -36,20 +41,23 @@ int coala_blas_dgemm
     int errcode;
     switch (probelist->probes[taskid].optimalR)
     {
+        #ifdef COALA_ENABLE_OPENBLAS
         case 0:
-            return 0;
+            errcode = cblas_dgemm(layout, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+            return errcode;
+        #endif
 
         #ifdef COALA_ENABLE_CUBLAS
         case 1:
-            if (cublasCreate(&handle) != CUBLAS_STATUS_SUCCESS) return CUBLAS_STATUS_FAILURE;
-            errcode = cublasDgemm(handle, tansa, tansb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+            errcode = cublasDgemm(probelist->handle, tansa, tansb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
             cudaDeviceSynchronize();
             return errcode;
         #endif
 
         #ifdef COALA_ENABLE_CLBLAST
         case 2:
-            return 0;
+            errcode = CLBlastDgemm(layout, transa, transb, m, n, k, alpha, A, 0, lda, B, 0, ldb, beta, C, 0, ldc, probelist->queue, probelist->event);
+            return errcode;
         #endif
 
         default:

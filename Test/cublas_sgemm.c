@@ -4,7 +4,6 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS // to disable deprecation warnings
 
 // Includes the CLBlast library (C interface)
 #include <cuda.h>

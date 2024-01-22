@@ -2,12 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define COALA_DEBUG //For debug
+
 #ifdef COALA_ENABLE_CUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
 #endif
 
-#define COALA_DEBUG //For debug
+#ifdef COALA_ENABLE_CLBLAST
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS 
+#include <clblast_c.h>
+#endif
+
 
 int coala_memop_devmalc
 (
@@ -51,8 +57,9 @@ int coala_memop_devmalc
             return cudaMalloc((void**)devptr,datasize);
         #endif
 
-        #ifdef COALA_ENABLE_OPENCL
+        #ifdef COALA_ENABLE_CLBLAST
         case 2:
+            *devptr = clCreateBuffer(probelist->context, CL_MEM_READ_WRITE, datasize, NULL, NULL);
             return 0;
         #endif
 

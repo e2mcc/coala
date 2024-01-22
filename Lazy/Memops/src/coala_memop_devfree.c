@@ -9,6 +9,10 @@
 #include <cuda_runtime.h>
 #endif
 
+#ifdef COALA_ENABLE_CLBLAST
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS 
+#include <clblast_c.h>
+#endif
 
 void coala_memop_devfree
 (
@@ -60,8 +64,9 @@ void coala_memop_devfree
             return;
         #endif
 
-        #ifdef COALA_ENABLE_OPENCL
+        #ifdef COALA_ENABLE_CLBLAST
         case 2:
+            clReleaseMemObject(devptr);
             return;
         #endif
 

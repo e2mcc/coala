@@ -9,6 +9,11 @@
 #include <cuda_runtime.h>
 #endif
 
+#ifdef COALA_ENABLE_CLBLAST
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS 
+#include <clblast_c.h>
+#endif
+
 int coala_memop_dev2host
 (   
     coala_probelist_t * probelist,
@@ -61,8 +66,9 @@ int coala_memop_dev2host
             return cudaMemcpy(hostptr,devptr,datasize,cudaMemcpyDeviceToHost);
         #endif
 
-        #ifdef COALA_ENABLE_OPENCL
+        #ifdef COALA_ENABLE_CLBLAST
         case 2:
+            clEnqueueReadBuffer(probelist->queue, devptr, CL_TRUE, 0, datasize, hostptr, 0, NULL, NULL);
             return 0;
         #endif
 
