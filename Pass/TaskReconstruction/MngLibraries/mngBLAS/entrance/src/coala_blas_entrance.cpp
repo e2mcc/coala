@@ -31,7 +31,7 @@ using namespace llvm;
 ===================================================*/
 PreservedAnalyses BlasPass::run(Module & M, ModuleAnalysisManager &MAM)
 {
-	outs()<<"This is the BlasPass\n";
+	outs()<<"This is the COALA Pass\n";
 	
 	// --------------------------
 	// 1.获取 Module 全局 task graph 对象

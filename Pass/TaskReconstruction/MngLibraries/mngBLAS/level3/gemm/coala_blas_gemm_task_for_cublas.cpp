@@ -191,21 +191,21 @@ void CoalaBlasGemmTask4Cublas::_setDevMalcCalleeInfo(Value * param)
 			auto _name = getDemangledName(*callee);
 			if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_CUDA_MALC])
 			{
-				outs()<<"终于找到你了："<<* _CI<<"\n";
+				// outs()<<"终于找到你了："<<* _CI<<"\n";
 				CoalaBlasGemmTask4Cublas::devmalc_callee_infos.push_back(
 					std::make_shared<CoalaMemopDevMalcCallee4Cuda>(_CI,COALA_MEMOP_CUDA_MALC));
 				return;
 			}
 			if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_DEVMALC])
 			{
-				outs()<<"终于找到你了："<<* _CI<<"\n";
+				// outs()<<"终于找到你了："<<* _CI<<"\n";
 				CoalaBlasGemmTask4Cublas::devmalc_callee_infos.push_back(
 					std::make_shared<CoalaMemopDevMalcCallee4Cuda>(_CI,COALA_MEMOP_DEVMALC));
 				return;
 			}
 		}
 	}
-	outs()<<"Wrong:setDevMalcCalleeInfo 没找到 CallInst\n";
+	// outs()<<"Wrong:setDevMalcCalleeInfo 没找到 CallInst\n";
 	exit(0);
 	return;
 }
@@ -273,14 +273,14 @@ void CoalaBlasGemmTask4Cublas::_setHost2DevCalleeInfo(Value * param)
 					auto _name = getDemangledName(*callee);
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_CUBLAS_H2D])
 					{
-						outs()<<"终于找到你了："<<* _CI<<"\n";
+						// outs()<<"终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::host2dev_callee_infos.push_back(
 							std::make_shared<CoalaMemopDataMigrationH2DCallee4Cublas>(_CI,COALA_MEMOP_CUBLAS_H2D));
 						return;
 					}
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_H2D])
 					{
-						outs()<<"终于找到你了："<<* _CI<<"\n";
+						// outs()<<"终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::host2dev_callee_infos.push_back(
 							std::make_shared<CoalaMemopDataMigrationH2DCallee4Cublas>(_CI,COALA_MEMOP_H2D));
 						return;
@@ -291,7 +291,7 @@ void CoalaBlasGemmTask4Cublas::_setHost2DevCalleeInfo(Value * param)
 		}
 		
 	}
-	outs()<<"Wrong:setHost2DevCalleeInfo 没找到 CallInst\n";
+	// outs()<<"Wrong:setHost2DevCalleeInfo 没找到 CallInst\n";
 	return;
 }
 
@@ -337,7 +337,7 @@ void CoalaBlasGemmTask4Cublas::_setDev2HostCalleeInfo(Value * param)
 	}
 
 	AllocaInst * _alloca = dyn_cast<AllocaInst>(_inst);
-	outs()<<"CoalaBlasGemmTask4Cublas::_setDev2HostCalleeInfo 找到 AllocaInst:\n\t"<<*_alloca<<"\n";
+	// outs()<<"CoalaBlasGemmTask4Cublas::_setDev2HostCalleeInfo 找到 AllocaInst:\n\t"<<*_alloca<<"\n";
 
 
 	//向下找use
@@ -359,14 +359,14 @@ void CoalaBlasGemmTask4Cublas::_setDev2HostCalleeInfo(Value * param)
 					auto _name = getDemangledName(*callee);
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_CUBLAS_D2H])
 					{
-						outs()<<"COALA_MEMOP_CUBLAS_D2H终于找到你了："<<* _CI<<"\n";
+						// outs()<<"COALA_MEMOP_CUBLAS_D2H终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::dev2host_callee_infos.push_back(
 							std::make_shared<CoalaMemopDataMigrationD2HCallee4Cublas>(_CI,COALA_MEMOP_CUBLAS_D2H));
 						return;
 					}
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_D2H])
 					{
-						outs()<<"COALA_MEMOP_D2H终于找到你了："<<* _CI<<"\n";
+						// outs()<<"COALA_MEMOP_D2H终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::dev2host_callee_infos.push_back(
 							std::make_shared<CoalaMemopDataMigrationD2HCallee4Cublas>(_CI,COALA_MEMOP_D2H));
 						return;
@@ -377,7 +377,7 @@ void CoalaBlasGemmTask4Cublas::_setDev2HostCalleeInfo(Value * param)
 		}
 		
 	}
-	outs()<<"Wrong:setDevt2HostCalleeInfo 没找到 CallInst\n";
+	// outs()<<"Wrong:setDevt2HostCalleeInfo 没找到 CallInst\n";
 	return;
 }
 
@@ -443,14 +443,14 @@ void CoalaBlasGemmTask4Cublas::_setDevFreeCalleeInfo(Value* param)
 					auto _name = getDemangledName(*callee);
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_CUDA_FREE])
 					{
-						outs()<<"终于找到你了："<<* _CI<<"\n";
+						// outs()<<"终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::devfree_callee_infos.push_back(
 							std::make_shared<CoalaMemopDevFreeCallee4Cuda>(_CI,COALA_MEMOP_CUDA_FREE));
 						break;
 					}
 					if( _name == COALA_MEMOP_NAMELIST[COALA_MEMOP_DEVFREE])
 					{
-						outs()<<"终于找到你了："<<* _CI<<"\n";
+						// outs()<<"终于找到你了："<<* _CI<<"\n";
 						CoalaBlasGemmTask4Cublas::devfree_callee_infos.push_back(
 							std::make_shared<CoalaMemopDevFreeCallee4Cuda>(_CI,COALA_MEMOP_DEVFREE));
 						break;
@@ -529,7 +529,7 @@ Value * CoalaBlasGemmTask4Cublas::getLDC()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CoalaBlasGemmTask4Cublas::dump() 
 {
-	outs()<<"名字: "<<CoalaBlasGemmTask4Cublas::getRoutineName()<<"\n"
+	outs()<<"Task Name: "<<CoalaBlasGemmTask4Cublas::getRoutineName()<<"\n"
 		<<*CoalaBlasGemmTask4Cublas::getRoutineParam("Handle")<<"\n"
 		<<*CoalaBlasGemmTask4Cublas::getRoutineParam("TransA")<<"\n"
 		<<*CoalaBlasGemmTask4Cublas::getRoutineParam("TransB")<<"\n"

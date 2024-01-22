@@ -465,8 +465,8 @@ void CoalaBlasGemmTask::reconstrcuting()
 		exit(0);
 	}
 
-	outs()<<"任务重构开始: 执行CoalaBlasGemmTask::reconstrcuting()\n";
-	outs()<<"--阶段 1: probe 插入\n";
+	outs()<<"Starting task reconstructing:\n";
+	outs()<<"--Stage 1: Probe Insert\n";
 	// CMakeList.txt 中要依赖 cornerstone 库文件
 	CoalaProbes probes = CoalaProbes(*CoalaBlasGemmTask::getRoutineCallee()->getCaller());
 	
@@ -482,42 +482,42 @@ void CoalaBlasGemmTask::reconstrcuting()
 			CoalaBlasGemmTask::routine_code,
 			3, loadm, loadn, loadk);
 
-	outs()<<"--阶段 1: 完成\n\n";
+	outs()<<"--Stage 1: complete\n\n";
 
-	outs()<<"--阶段 2: devmalc 转换\n";
+	outs()<<"--Stage 2: devmalc reconstructing\n";
 	//transform memop to coala
 	for (size_t i = 0; i < CoalaBlasGemmTask::devmalc_callee_infos.size(); ++i) 
 	{
     	auto & callee = CoalaBlasGemmTask::devmalc_callee_infos[i];
 		callee->transform2coala(probes.getCoalaProbelistGV(), CoalaBlasGemmTask::taskid);
 	}
-	outs()<<"--阶段 2: 完成\n\n";
+	outs()<<"--Stage 2: complete\n\n";
 
-	outs()<<"--阶段 3: host2dev 转换\n";
+	outs()<<"--Stage 3: host2dev reconstructing\n";
 	for (size_t i = 0; i < CoalaBlasGemmTask::host2dev_callee_infos.size(); ++i) 
 	{
     	auto & callee = CoalaBlasGemmTask::host2dev_callee_infos[i];
 		callee->transform2coala(probes.getCoalaProbelistGV(), CoalaBlasGemmTask::taskid);
 	}
-	outs()<<"--阶段 3: 完成\n\n";
+	outs()<<"--Stage 3: complete\n\n";
 
-	outs()<<"--阶段 4: dev2host 转换\n";
+	outs()<<"--Stage 4: dev2host reconstructing\n";
 	for (size_t i = 0; i < CoalaBlasGemmTask::dev2host_callee_infos.size(); ++i) 
 	{
     	auto & callee = CoalaBlasGemmTask::dev2host_callee_infos[i];
 		callee->transform2coala(probes.getCoalaProbelistGV(), CoalaBlasGemmTask::taskid);
 	}
-	outs()<<"--阶段 4: 完成\n\n";
+	outs()<<"--Stage 4: complete\n\n";
 
-	outs()<<"--阶段 5: devfree 转换\n";
+	outs()<<"--Stage 5: devfree reconstructing\n";
 	for (size_t i = 0; i < CoalaBlasGemmTask::devfree_callee_infos.size(); ++i) 
 	{
     	auto & callee = CoalaBlasGemmTask::devfree_callee_infos[i];
 		callee->transform2coala(probes.getCoalaProbelistGV(), CoalaBlasGemmTask::taskid);
 	}
-	outs()<<"--阶段 5: 完成\n\n";
+	outs()<<"--Stage 5: complete\n\n";
 
-	outs()<<"--阶段 6: blas_gemm 转换\n";
+	outs()<<"--Stage 6: blas_gemm reconstructing\n";
 	switch (CoalaBlasGemmTask::routine_code)
 	{
 		case COALA_BLAS_CUBLAS_SGEMM:
@@ -534,7 +534,8 @@ void CoalaBlasGemmTask::reconstrcuting()
 			outs()<<"WRONG: coala_blas_gemm_task::reconstrcuting(): routine_code is not supported\n";
 			exit(0);
 	}
-	outs()<<"--阶段 6: 完成\n\n";
+	outs()<<"--Stage 6: complete\n\n";
+	outs()<<"--Task reconstruction done\n\n";
 	return;
 }
 

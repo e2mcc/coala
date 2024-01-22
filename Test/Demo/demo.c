@@ -19,7 +19,10 @@ int main (int argc,char **argv)
     float * devPtrA = NULL;
     float * devPtrB = NULL;
     float * devPtrC = NULL;
-
+    devPtrA = (float *)malloc(M * K * sizeof (*devPtrA));
+    devPtrB = (float *)malloc(K * N * sizeof (*devPtrB));
+    devPtrC = (float *)malloc(M * N * sizeof (*devPtrC));
+    
     float alpha = 1.0;
     float beta = 0.7;
 

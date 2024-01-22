@@ -253,7 +253,7 @@ Value * CoalaBlasGemmTask4Cblas::getLDC()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CoalaBlasGemmTask4Cblas::dump() 
 {
-	outs()<<"名字: "<<CoalaBlasGemmTask4Cblas::getRoutineName()<<"\n"
+	outs()<<"Task Name: "<<CoalaBlasGemmTask4Cblas::getRoutineName()<<"\n"
 		<<"Layout:\t"<<*CoalaBlasGemmTask4Cblas::getRoutineParam("Layout")<<"\n"
 		<<"TransA:\t"<<*CoalaBlasGemmTask4Cblas::getRoutineParam("TransA")<<"\n"
 		<<"TransB:\t"<<*CoalaBlasGemmTask4Cblas::getRoutineParam("TransB")<<"\n"

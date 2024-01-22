@@ -97,14 +97,14 @@ void BlasManagement::_analyzing(Module & M)
 	for (auto & pair : BlasManagement::blas_routine_callees)
 	{
 		//根据callee的name创建task
-		outs()<<"正在处理: pair.first="<<*pair.first<<"\n";
+		outs()<<"Locating "<<*pair.first<<"\n";
 		std::shared_ptr<CoalaBlasTask> cbt = CoalaBlasTaskFactory::createACoalaBlasTask(pair.first, pair.second, taskid);
-		outs()<<"BlasManagement::blas_tasks.size()="<<BlasManagement::blas_tasks.size()<<"\n";
+		// outs()<<"BlasManagement::blas_tasks.size()="<<BlasManagement::blas_tasks.size()<<"\n";
 		if(cbt!=nullptr)
 		{
 			BlasManagement::blas_tasks.push_back(cbt);
-			outs()<<"BlasManagement::blas_tasks.size()="<<BlasManagement::blas_tasks.size()<<"\n";
-			BlasManagement::blas_tasks[0]->dump();
+			// outs()<<"BlasManagement::blas_tasks.size()="<<BlasManagement::blas_tasks.size()<<"\n";
+			// BlasManagement::blas_tasks[0]->dump();
 			BlasManagement::blas_tasks[0]->reconstrcuting();
 		}
 

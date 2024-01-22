@@ -46,7 +46,7 @@ int coala_memop_host2dev
 
 
     #ifdef COALA_DEBUG
-    printf("coala_memop_host2dev\n");
+    printf("Here in coala_memop_host2dev\n");
     printf("--taskid=%ld\n",taskid);
     printf("--probelist->probes[0]->taskcode=%ld\n",probelist->probes[0].taskcode);
     printf("--probelist->probes[0].datasizenum=%ld\n",probelist->probes[0].datasizenum);

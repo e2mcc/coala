@@ -3,13 +3,13 @@
 
 cublasStatus_t cublasCreate(cublasHandle_t * handle)
 {
-    printf("Here in cublasCreate\n");
+    // printf("Here in cublasCreate\n");
     return CUBLAS_STATUS_SUCCESS;
 }
 
 cublasStatus_t cublasSetMatrix (int M, int N, int size, float * A, int ldA, float * devPtrA, int ldPtrA)
 {
-    printf("Here in cublasSetMatrix\n");    
+    // printf("Here in cublasSetMatrix\n"); 
     return CUBLAS_STATUS_SUCCESS;
 }
 
@@ -32,14 +32,14 @@ cublasStatus_t cublasSgemm
 
 cublasStatus_t cublasGetMatrix (int M, int N, int size, float * devPtrA, int ldDevA, float * A, int ldA)
 {
-    printf("Here in cublasGetMatrix\n");
+    // printf("Here in cublasGetMatrix\n");
     return CUBLAS_STATUS_SUCCESS;
 }
 
 
 void cublasDestroy(cublasHandle_t handle)
 {
-    printf("Here in cublasDestroy\n"); 
+    // printf("Here in cublasDestroy\n"); 
     return;
 }
 
