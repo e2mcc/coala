@@ -45,7 +45,7 @@ class CoalaMlpModel
 
     void forward(float* Mat, int examples, int features);
     
-    float cost(float * VecPred, float * VecReal, int dim);
+    float cost(float * MatPred, float * MatReal, int examples, int output_layer_neurons);
 
     void backward(float * real_mat, int examples, int real_dim);
 

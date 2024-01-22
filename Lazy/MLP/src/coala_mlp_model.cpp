@@ -84,9 +84,9 @@ void CoalaMlpModel::forward(float* mat, int examples, int features)
     return;
 }
 
-float CoalaMlpModel::cost(float * VecPred, float * VecReal, int dim)
+float CoalaMlpModel::cost(float * MatPred, float * MatReal, int examples, int output_layer_neurons)
 {
-    return coala_mlp_smse(VecPred, VecReal, dim);
+    return coala_mlp_smse(MatPred,  MatReal, examples, output_layer_neurons);
 }
 
 

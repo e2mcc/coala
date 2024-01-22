@@ -55,5 +55,12 @@ int coala_mlp_saxpy
     size_t incy
 );
 
-
+float coala_mlp_sdot
+(
+    size_t m,
+    float * X,
+    size_t incx,
+    float * Y,
+    size_t incy
+);
 #endif

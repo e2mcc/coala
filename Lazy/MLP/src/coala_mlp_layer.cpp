@@ -3,6 +3,7 @@
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_layer.h"
 #include "coala_mlp_blas.h"
+#include "coala_mlp_loss.h"
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
@@ -359,15 +360,9 @@ void CoalaMlpOutputLayer::backward(float * real_mat, int examples, int real_dim)
         return;
     }
 
-    // dMSE/dyij = 2/m * (yij - rij)
+    // dMSE/dyij = 1/mn * (yij - rij)
     this->dloss2dy = (float*)malloc(sizeof(float) * examples * this->neurons);
-    for(int i=0; i<examples; i++)
-    {
-        for(int j=0; j<real_dim; j++)
-        {
-            this->dloss2dy[i+j*examples] = 2*(this->output_y[i+j*examples] - real_mat[i+j*examples])/examples;
-        }
-    }
+    coala_mlp_smse_grad(this->dloss2dy, this->output_y, real_mat, examples, real_dim);
 
     //dyij/dzij
     this->dy2dz = (float*)malloc(sizeof(float) * examples * this->neurons);

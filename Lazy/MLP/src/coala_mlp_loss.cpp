@@ -3,27 +3,30 @@
 //----------------------------------------------------------------------------------------------
 
 #include "coala_mlp_loss.h"
+#include "coala_mlp_blas.h"
 #include <math.h>
+#include <string.h>
 
-float coala_mlp_smse(float * VecPred, float * VecReal, int size)
+float coala_mlp_smse(float * MatPred, float * MatReal, int RowDim, int ColDim)
 {
-   float loss = 0.0;
-    for(int i = 0; i < size; ++i) 
-    {
-        loss += pow((VecPred[i] - VecReal[i]), 2);
-    }
-    loss /= size;
-    return loss;
+    float * temp = (float *)malloc(sizeof(float) * RowDim * ColDim);
+    memcpy(temp, MatPred, sizeof(float) * RowDim * ColDim);
+    coala_mlp_saxpy(RowDim * ColDim, -1.0, MatReal, 1, temp, 1);
+    float loss = 0.0f;
+    loss = coala_mlp_sdot(RowDim * ColDim, temp, 1, temp, 1);
+    free(temp);
+    return loss / (float)(2 * RowDim * ColDim);
 }
 
-double coala_mlp_dmse(double * VecPred, double * VecReal, int size)
+void coala_mlp_smse_grad(float * MatGrad, float * MatPred, float * MatReal, int RowDim, int ColDim)
 {
-    double loss = 0.0;
-    for(int i = 0; i < size; ++i) 
-    {
-        loss += pow((VecPred[i] - VecReal[i]), 2);
-    }
-    loss /= size;
+    memcpy(MatGrad, MatPred, sizeof(float) * RowDim * ColDim);
     
-    return loss;
+    coala_mlp_saxpy(RowDim * ColDim, -1.0, MatReal, 1, MatGrad, 1);
+    
+    float size = (float)(RowDim * ColDim);
+
+    coala_mlp_saxpy(RowDim * ColDim, (1.0-size) / size, MatGrad, 1, MatGrad, 1);
+
+    return;
 }
