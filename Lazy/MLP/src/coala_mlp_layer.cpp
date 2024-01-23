@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
-
+#include <algorithm>
 //----------------------------------------------------------------------------------------------
 // CoalaMlpInputLayer
 //----------------------------------------------------------------------------------------------
@@ -191,6 +191,7 @@ void CoalaMlpHiddenLayer::forward(float * input, int examples)
 
 void CoalaMlpHiddenLayer::backward()
 {
+
     return;
 }
 
@@ -281,7 +282,7 @@ void CoalaMlpOutputLayer::initializeWeights(COALA_MLP_INITIALIZATION initializat
 
 void CoalaMlpOutputLayer::forward(float * input, int examples)
 {
-    this->input = input;
+    this->input_x = input;
     if(trained_times==0)
     {
         this->output_z = (float*)malloc(sizeof(float) * examples * this->neurons);
@@ -310,9 +311,9 @@ void CoalaMlpOutputLayer::forward(float * input, int examples)
     }
     
     if( n == 1 )
-        coala_mlp_sgemv(1, 0, m, k, 1.0f, this->input, m, this->weights, 1, 1.0f, this->output_z, 1);
+        coala_mlp_sgemv(1, 0, m, k, 1.0f, this->input_x, m, this->weights, 1, 1.0f, this->output_z, 1);
     else    
-        coala_mlp_sgemm(1, 0, 0, m, n, k, 1.0f, this->input, m, this->weights, k, 1.0f, this->output_z, m);
+        coala_mlp_sgemm(1, 0, 0, m, n, k, 1.0f, this->input_x, m, this->weights, k, 1.0f, this->output_z, m);
 
 
     //------------------------------------------------------------------------------------------------
@@ -361,63 +362,56 @@ void CoalaMlpOutputLayer::backward(float * real_mat, int examples, int real_dim)
     }
 
     // dMSE/dyij = 1/mn * (yij - rij)
-    this->dloss2dy = (float*)malloc(sizeof(float) * examples * this->neurons);
-    coala_mlp_smse_grad(this->dloss2dy, this->output_y, real_mat, examples, real_dim);
+    float * dloss2dy = (float*)malloc(sizeof(float) * examples * this->neurons);
+    coala_mlp_smse_grad(dloss2dy, this->output_y, real_mat, examples, real_dim);
 
     //dyij/dzij
-    this->dy2dz = (float*)malloc(sizeof(float) * examples * this->neurons);
+    float * dy2dz = (float*)malloc(sizeof(float) * examples * this->neurons);
     switch(this->activation_function)
     {
         case COALA_MLP_ACTIVATION_NONE:
+            std::fill(dy2dz, dy2dz + examples * this->neurons, 1.0f);
             break;
         case COALA_MLP_ACTIVATION_SIGMOID:
-            coala_mlp_ssigmoid_gradient(this->dy2dz, this->output_z, examples*real_dim);
+            coala_mlp_ssigmoid_gradient(dy2dz, this->output_z, examples*real_dim);
             break;
         case COALA_MLP_ACTIVATION_TANH:
-            coala_mlp_stanh_gradient(this->dy2dz, this->output_z, examples*real_dim);
+            coala_mlp_stanh_gradient(dy2dz, this->output_z, examples*real_dim);
             break;
         case COALA_MLP_ACTIVATION_RELU:
-            coala_mlp_srelu_gradient(this->dy2dz, this->output_z, examples*real_dim);
+            coala_mlp_srelu_gradient(dy2dz, this->output_z, examples*real_dim);
             break;
         case COALA_MLP_ACTIVATION_LEAKY_RELU:
-            coala_mlp_sleakyrelu_gradient(this->dy2dz, this->output_z, examples*real_dim);
+            coala_mlp_sleakyrelu_gradient(dy2dz, this->output_z, examples*real_dim);
             break;
         case COALA_MLP_ACTIVATION_SOFTMAX:
-            coala_mlp_ssoftmax_gradient(this->dy2dz, this->output_z, examples, real_dim);
+            coala_mlp_ssoftmax_gradient(dy2dz, this->output_z, examples, real_dim);
             break;
         default:
             break;
     }
 
+    // dloss/dzij = dloss/dyij * dyij/dzij
+    float * dloss2dz  = (float*)malloc(sizeof(float) * examples * this->neurons);
+    coala_mlp_shadamm(examples, this->neurons, dloss2dy, examples, dy2dz, examples, dloss2dz, examples);
+
+
     // dzij/dwpj = hip ; hip 是本层的输入，也是隐藏层的输出
-    // dmse/dwpj = 1/m sum_i{ dMSE/dyij * dyij/dzij * hip }
-    for( int p=0; p<this->features; p++)
-    {
-        for(int j=0;j<this->neurons; j++)
-        {
-            float sum = 0.0;
-            for(int i=0;i<examples;i++)
-            {
-                sum += this->dloss2dy[i+j*examples] * this->dy2dz[i+j*examples] * this->input[i+p*examples];
-                
-            }
-            this->weights_gradient[p+j*this->features] = sum/examples;
-        }
-    }
+    // dmse/dwpj = 1/m sum_i{ dloss/dzij * hip }
+    coala_mlp_sgemm(0, 1, 0, this->features, this->neurons, examples, 1.0f/(float)examples, this->input_x, examples, dloss2dz, examples, 0.0f, this->weights_gradient, this->features);
 
-    // dzij/dbj = 1 ;
-    // dmse/dbj = 1/m sum_i{ dMSE/dyij * dyij/dzij * 1}
-    for(int j=0;j<this->neurons; j++)
-    {
-        float sum = 0.0;
-        for(int i=0;i<examples;i++)
-        {
-            sum += this->dloss2dy[i+j*examples] * this->dy2dz[i+j*examples];
-            
-        }
-        this->biases_gradient[j] = sum/examples;
-    }
+    // dzij/dbj = 1;
+    // dmse/dbj = 1/m sum_i{ dloss/dzij * 1}
+    float one = 1.0f;
+    coala_mlp_sgemv(0, 1, this->neurons, examples, 1.0f/(float)examples, dloss2dz, examples, &one, 0, 0.0f,this->biases_gradient,1);
 
+    // dzij/dhip = wjp
+    // dloss/dhip = sum_j{ dloss/dyij * dyij/dzij * dzij/dhip }
+    // this->dloss2dx = (float*)malloc(sizeof(float) * examples * this->features);
+    // coala_mlp_sgemm(0, 0, 1, examples, this->features, this->neurons, 1.0f, this->dloss2dy, examples, this->weights, this->features, 0.0f, this->dloss2dx, examples);
+
+    free(dloss2dy);
+    free(dy2dz);
     return;
 }
 

@@ -128,11 +128,10 @@ class CoalaMlpOutputLayer
     float * biases;              //< The biases of the layer.
     float * weights_gradient;    //< The gradients of the weights.
     float * biases_gradient;     //< The gradients of the biases.
-    float * input;               //< The input to the layer.
+    float * input_x;               //< The input to the layer.
+    float * input_gradient;      //< The gradients of the input.
     float * output_z;              //the output of the layer before activation
     float * output_y;              //< The output of the layer.
-    float * dloss2dy;      //< The gradients of the input.
-    float * dy2dz;     //< The gradients of the output.
     int features;           //< The size of the input.
     int neurons;          //< The size of the output.
     int activation_function;    //< The activation function of the layer.

@@ -63,4 +63,18 @@ float coala_mlp_sdot
     float * Y,
     size_t incy
 );
+
+
+//两个矩阵的对应元素进行相乘的运算被称为哈达玛积(Hadamard)
+int coala_mlp_shadamm
+(
+    size_t m,
+    size_t n,
+    float * A,
+    size_t lda,
+    float * B,
+    size_t ldb,
+    float * C,
+    size_t ldc
+);
 #endif

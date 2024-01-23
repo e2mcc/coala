@@ -88,5 +88,40 @@ float coala_mlp_sdot
     size_t incy
 )
 {
+    float result = 0.0f;
+    size_t xidx = 0;
+    size_t yidx = 0;
+    // 只做m次计算
+    for(size_t count = 0; count<m; count++)
+    {
+        result += X[xidx]*Y[yidx];
+        yidx += incy;
+        xidx += incx;
+    }
+    return result;
+}
+
+
+//列优先存储
+//两个矩阵的对应元素进行相乘的运算被称为哈达玛积(Hadamard)
+int coala_mlp_shadamm
+(
+    size_t m,
+    size_t n,
+    float * A,
+    size_t lda,
+    float * B,
+    size_t ldb,
+    float * C,
+    size_t ldc
+)
+{
+    for (size_t i = 0; i < m; i++) 
+    {
+        for (size_t j = 0; j < n; j++) 
+        {
+            C[i + j*ldc] = A[i + j*lda] * B[i + j*ldb];
+        }
+    }
     return 0;
 }
