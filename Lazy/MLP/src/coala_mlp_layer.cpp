@@ -410,6 +410,7 @@ void CoalaMlpOutputLayer::backward(float * real_mat, int examples, int real_dim)
     // this->dloss2dx = (float*)malloc(sizeof(float) * examples * this->features);
     // coala_mlp_sgemm(0, 0, 1, examples, this->features, this->neurons, 1.0f, this->dloss2dy, examples, this->weights, this->features, 0.0f, this->dloss2dx, examples);
 
+    free(dloss2dz);
     free(dloss2dy);
     free(dy2dz);
     return;
