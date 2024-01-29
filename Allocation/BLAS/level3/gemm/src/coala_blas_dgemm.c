@@ -34,7 +34,7 @@ int coala_blas_dgemm
     #endif
 
     #ifdef COALA_MLP_PREDICT
-    probelist->probes[taskid].optimalR = modelPredictSGemm(m,n,k);
+    probelist->probes[taskid].optimalR = modelPredictDGemm(m,n,k);
     #endif
     
     //TODO: 这里还需要考虑转置的问题
