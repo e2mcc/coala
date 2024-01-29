@@ -32,7 +32,7 @@ int main(int argc,char **argv)
 	FILE * fp = fopen("./test_data.csv","w");
 	
 	//1000GFLOPS
-	double const peak = PEAK_CPU;
+	double const peak = CPU_FP32_PEAK;
 	if(peak==0||peak<0)
 	{
 		fprintf(stderr,"peak's settings are wrong\n");
