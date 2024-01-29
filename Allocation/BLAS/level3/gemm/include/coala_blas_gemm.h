@@ -1,4 +1,4 @@
-#ifndef  _COALA_BLAS_GEMM_H
+#ifndef _COALA_BLAS_GEMM_H
 #define _COALA_BLAS_GEMM_H
 
 #include "coala_blas_base.h"
