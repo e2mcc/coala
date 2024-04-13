@@ -24,4 +24,7 @@ typedef enum
 float coala_mlp_smse(float * MatPred, float * MatReal, int RowDim, int ColDim);
 void coala_mlp_smse_grad(float * MatGrad, float * MatPred, float * MatReal, int RowDim, int ColDim);
 
+float coala_mlp_cost(COALA_MLP_LOSS losstype, float * MatPred, float * MatReal, int RowDim, int ColDim);
+void coala_mlp_costGrad(COALA_MLP_LOSS losstype, float * MatGrad, float * MatPred, float * MatReal, int RowDim, int ColDim);
+
 #endif // COALA_MLOP_LOSS_H

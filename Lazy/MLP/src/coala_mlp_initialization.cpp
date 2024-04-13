@@ -4,26 +4,56 @@
 #include "coala_mlp_initialization.h"
 #include <cstdlib>
 #include <cmath>
+#include <string.h>
 
+int coala_mlp_szero(float * vec, int size)
+{
+    memset(vec, 0, sizeof(float) * size);
+    return 0;
+}
 
-int coala_mlp_srandom(float * output, int size, int seed)
+int coala_mlp_dzero(double * vec, int size)
+{
+    memset(vec, 0, sizeof(double) * size);
+    return 0;
+}
+
+int coala_mlp_sones(float * vec, int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        vec[i] = 1.0;
+    }
+    return 0;
+}
+
+int coala_mlp_dones(double * vec, int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        vec[i] = 1.0;
+    }
+    return 0;
+}
+
+int coala_mlp_srandom(float * vec, int size, int seed)
 {
     srand(seed);
 
     for(int i = 0; i < size; i++)
     {
-        output[i] = (float)rand() / (float)RAND_MAX;
+        vec[i] = (float)rand() / (float)RAND_MAX;
     }
     return 0;
 }
 
-int coala_mlp_drandom(double * output, int size, int seed)
+int coala_mlp_drandom(double * vec, int size, int seed)
 {
     srand(seed);
     
     for(int i = 0; i < size; i++)
     {
-        output[i] = (double)rand() / (double)RAND_MAX;
+        vec[i] = (double)rand() / (double)RAND_MAX;
     }
     return 0;
 }

@@ -1,172 +1,296 @@
 #include "coala_mlp_model.h"
-#include "coala_mlp_loss.h"
-#include <string>
 
-CoalaMlpModel::CoalaMlpModel(int input_layer_neurons, int hidden_layers_count=1, int hidden_layers_neurons=5, int output_layer_neurons=1, float learning_rate=0.01f)
+using namespace coala::mlp;
+
+
+CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=1, int const output_layer_neurons=1)
 {
+    //默认参数设置
+    this->input_layer_neurons = input_layer_neurons;
     this->hidden_layers_count = hidden_layers_count;
-    this->learning_rate = learning_rate;
-
-    this->input_layer = std::make_shared<CoalaMlpInputLayer>(input_layer_neurons);
-   
-    this->hidden_layers = std::vector<std::shared_ptr<CoalaMlpHiddenLayer>>(hidden_layers_count);
+    this->output_layer_neurons = output_layer_neurons;
+    this->batch_size = 1;
     for(int i=0; i<hidden_layers_count; i++)
     {
-        if(i==0)
-        {
-            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(input_layer_neurons,hidden_layers_neurons);
-        }
-        else
-        {
-            this->hidden_layers[i] = std::make_shared<CoalaMlpHiddenLayer>(output_layer_neurons,hidden_layers_neurons);
-        }
-        this->hidden_layers[i]->setActivation(COALA_MLP_ACTIVATION_RELU);
+        this->hidden_layers_neurons.push_back(5*this->input_layer_neurons);
+        this->hidden_layer_activation_funcs.push_back(COALA_MLP_ACTIVATION_NONE);
+    }
+    this->output_layer_activation_func = COALA_MLP_ACTIVATION_NONE;
+    this->initialization_func = COALA_MLP_INITIALIZATION_NONE;
+    this->cost_func = COALA_MLP_LOSS_MSE;
+
+    //---------------------------------------------------------------------
+    // 构建计算图
+    //---------------------------------------------------------------------
+    //计算总节点数
+    int total_nodes_count = 1+hidden_layers_count*8+8+3;
+
+    //构建计算图
+    this->graph = std::make_shared<CoalaMlpGraph>(total_nodes_count);
+    
+    //输入层：输入数据的节点
+    this->graph->addNode(std::make_shared<Variable>(0));
+
+
+    //隐含层
+    for(int i=0;i<this->hidden_layers_count;i++)
+    {
+        this->graph->addNode(std::make_shared<OperatorDot>(i*8+1)); // 乘
+        this->graph->setForwardEdge(i*8,i*8+1);
+        this->graph->setBackwardEdge(i*8+1,i*8);
+
+        this->graph->addNode(std::make_shared<Variable>(i*8+2)); // W
+        this->graph->setForwardEdge(i*8+2,i*8+1);
+        this->graph->setBackwardEdge(i*8+1,i*8+2);
+
+
+        this->graph->addNode(std::make_shared<Variable>(i*8+3)); // ans
+        this->graph->setForwardEdge(i*8+1,i*8+3);
+        this->graph->setBackwardEdge(i*8+3,i*8+1);
+
+        this->graph->addNode(std::make_shared<OperatorAdd>(i*8+4)); // 加
+        this->graph->setForwardEdge(i*8+3,i*8+4);
+        this->graph->setBackwardEdge(i*8+4,i*8+3);
+
+        this->graph->addNode(std::make_shared<Variable>(i*8+5)); // B
+        this->graph->setForwardEdge(i*8+5,i*8+4);
+        this->graph->setBackwardEdge(i*8+4,i*8+5);
+
+        this->graph->addNode(std::make_shared<Variable>(i*8+6)); // ans
+        this->graph->setForwardEdge(i*8+4,i*8+6);
+        this->graph->setBackwardEdge(i*8+6,i*8+4);
+
+        this->graph->addNode(std::make_shared<OperatorActivation>(i*8+7)); // 激活函数
+        this->graph->setForwardEdge(i*8+6,i*8+7);
+        this->graph->setBackwardEdge(i*8+7,i*8+6);
+
+        this->graph->addNode(std::make_shared<Variable>(i*8+8)); // ans
+        this->graph->setForwardEdge(i*8+7,i*8+8);
+        this->graph->setBackwardEdge(i*8+8,i*8+7);
     }
 
-    this->output_layer = std::make_shared<CoalaMlpOutputLayer>(hidden_layers_neurons, output_layer_neurons);
-    this->output_layer->setActivation(COALA_MLP_ACTIVATION_SIGMOID);
+    //输出层
+    this->graph->addNode(std::make_shared<OperatorDot>(hidden_layers_count*8+1)); // 乘
+    this->graph->setForwardEdge(hidden_layers_count*8,hidden_layers_count*8+1);
+    this->graph->setBackwardEdge(hidden_layers_count*8+1,hidden_layers_count*8);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+2)); // W
+    this->graph->setForwardEdge(hidden_layers_count*8+2,hidden_layers_count*8+1);
+    this->graph->setBackwardEdge(hidden_layers_count*8+1,hidden_layers_count*8+2);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+3)); // ans
+    this->graph->setForwardEdge(hidden_layers_count*8+1,hidden_layers_count*8+3);
+    this->graph->setBackwardEdge(hidden_layers_count*8+3,hidden_layers_count*8+1);
+
+    this->graph->addNode(std::make_shared<OperatorAdd>(hidden_layers_count*8+4)); // 加
+    this->graph->setForwardEdge(hidden_layers_count*8+3,hidden_layers_count*8+4);
+    this->graph->setBackwardEdge(hidden_layers_count*8+4,hidden_layers_count*8+3);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+5)); // B
+    this->graph->setForwardEdge(hidden_layers_count*8+5,hidden_layers_count*8+4);
+    this->graph->setBackwardEdge(hidden_layers_count*8+4,hidden_layers_count*8+5);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+6)); // ans
+    this->graph->setForwardEdge(hidden_layers_count*8+4,hidden_layers_count*8+6);
+    this->graph->setBackwardEdge(hidden_layers_count*8+6,hidden_layers_count*8+4);
+
+    this->graph->addNode(std::make_shared<OperatorActivation>(hidden_layers_count*8+7)); // 激活函数
+    this->graph->setForwardEdge(hidden_layers_count*8+6,hidden_layers_count*8+7);
+    this->graph->setBackwardEdge(hidden_layers_count*8+7,hidden_layers_count*8+6);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+8)); // 预测值
+    this->graph->setForwardEdge(hidden_layers_count*8+7,hidden_layers_count*8+8);
+    this->graph->setBackwardEdge(hidden_layers_count*8+8,hidden_layers_count*8+7);
+
+
+    //损失
+    this->graph->addNode(std::make_shared<OperatorCost>(hidden_layers_count*8+8+1)); // 损失函数
+    this->graph->setForwardEdge(hidden_layers_count*8+8,hidden_layers_count*8+8+1);
+    this->graph->setBackwardEdge(hidden_layers_count*8+8+1,hidden_layers_count*8+8);
+
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+8+2)); // 真实值
+    this->graph->setForwardEdge(hidden_layers_count*8+8+2,hidden_layers_count*8+8+1);
+    this->graph->setBackwardEdge(hidden_layers_count*8+8+1,hidden_layers_count*8+8+2);
+    
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+8+3)); // 损失
+    this->graph->setForwardEdge(hidden_layers_count*8+8+1,hidden_layers_count*8+8+3);
+    this->graph->setBackwardEdge(hidden_layers_count*8+8+3,hidden_layers_count*8+8+1);
+
+   
 }
 
 
-
-int CoalaMlpModel::setHiddenLayer(int hidden_layer_rank, COALA_MLP_ACTIVATION activation_rank, int output_size)
+int CoalaMLP::setTraningBatch(int const batch_size)
 {
-    if(hidden_layer_rank < 0 || hidden_layer_rank >= this->hidden_layers_count) return -1;
-    
-    this->hidden_layers[hidden_layer_rank]->setActivation(activation_rank);
-    
-    this->hidden_layers[hidden_layer_rank]->setOutputSize(output_size);
+    this->batch_size = batch_size;
+    return 0;
+}
 
-    int nextlayer = hidden_layer_rank+1;
-    if( nextlayer < this->hidden_layers_count)
-        this->hidden_layers[nextlayer]->setInputSize(output_size);
-    else
-        this->output_layer->setInputSize(output_size);
+int CoalaMLP::setHiddenLayersNeurons(int const layer, int const neurons)
+{
+    if(layer < 0 || layer >= this->hidden_layers_count) return 1;
+    this->hidden_layers_neurons[layer] = neurons;
+    return 0;
+}
+
+int CoalaMLP::setHiddenLayerActivation(int const layer, COALA_MLP_ACTIVATION const activation_func)
+{
+    this->hidden_layer_activation_funcs[layer] = activation_func;
+    return 0;
+}
+
+int CoalaMLP::setOutputLayerActivation(COALA_MLP_ACTIVATION const activation_func)
+{
+    this->output_layer_activation_func = activation_func;
+    return 0;
+}
+
+int CoalaMLP::setCostFunction(COALA_MLP_LOSS const cost_func)
+{
+    this->cost_func = cost_func;
     return 0;
 }
 
 
-int CoalaMlpModel::setOutputLayerActivation(COALA_MLP_ACTIVATION activation_rank)
+int CoalaMLP::setInitializationFunction(COALA_MLP_INITIALIZATION const initialization_func)
 {
-    this->output_layer->setActivation(activation_rank);
+    this->initialization_func = initialization_func;
     return 0;
 }
 
 
-
-void CoalaMlpModel::initializeWeights(COALA_MLP_INITIALIZATION initialization_rank)
+int CoalaMLP::readyForTraining(void)
 {
-    for(int i=0; i<this->hidden_layers_count; i++)
+    Variable * vnode;
+    
+    //输入层：输入数据的节点
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(0).get()))
     {
-        this->hidden_layers[i]->initializeWeights(initialization_rank);
+        vnode->setDataSize(this->batch_size,this->input_layer_neurons);
+        vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
     }
-    this->output_layer->initializeWeights(initialization_rank);
-    return;
-}
-
-
-void CoalaMlpModel::forward(float* mat, int examples, int features)
-{
-    this->input_layer->forward(mat, examples, features);
-    for(int i=0; i<this->hidden_layers_count; i++)
-    {
-        if(i==0)
-        {
-            this->hidden_layers[i]->forward(this->input_layer->getOutput(), examples);
-        }
-        else
-        {
-            this->hidden_layers[i]->forward(this->hidden_layers[i-1]->getOutput(), examples);
-        }
-    }
-    this->output_layer->forward(this->hidden_layers[this->hidden_layers_count-1]->getOutput(), examples);
-    this->trained_times++;
-    return;
-}
-
-float CoalaMlpModel::cost(float * MatPred, float * MatReal, int examples, int output_layer_neurons)
-{
-    return coala_mlp_smse(MatPred,  MatReal, examples, output_layer_neurons);
-}
-
-
-void CoalaMlpModel::backward(float * real_mat, int examples, int real_dim)
-{
-    this->output_layer->backward(real_mat, examples, real_dim);
-    for(int i=this->hidden_layers_count-1; i>=0; i--)
-    {
        
-        this->hidden_layers[i]->backward();
-    }
-    this->input_layer->backward();
-    return;
-}
-
-
-void CoalaMlpModel::update(float learning_rate)
-{
-    this->input_layer->update(learning_rate);
-    for(int i=0; i<this->hidden_layers_count; i++)
+    //---------------------------------------------------------------------
+    // Variable 设置
+    //---------------------------------------------------------------------
+    //隐含层
+    for(int i=0;i<this->hidden_layers_count;i++)
     {
-        this->hidden_layers[i]->update(learning_rate);
-    }
-    this->output_layer->update(learning_rate);
-    return;
-}
+        if(vnode = dynamic_cast<Variable*>(this->graph->getNode(i*8+2).get()))
+        {
+            vnode->setDataSize( dynamic_cast<Variable*>(this->graph->getNode(i*8).get())->getDataCols(), this->hidden_layers_neurons[i] ); // W
+            vnode->setInitializationFunction(this->initialization_func);
+        }
+            
+        
+        if(vnode = dynamic_cast<Variable*>(this->graph->getNode(i*8+3).get()))
+        {
+            vnode->setDataSize( this->batch_size, this->hidden_layers_neurons[i] ); // ans
+            vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+        }
+            
+        
+        if(vnode = dynamic_cast<Variable*>(this->graph->getNode(i*8+5).get()))
+        {
+            vnode->setDataSize( this->batch_size, this->hidden_layers_neurons[i] ); // B
+            vnode->setInitializationFunction(this->initialization_func);
+        }
+        
+        if(vnode = dynamic_cast<Variable*>(this->graph->getNode(i*8+6).get()))
+        {
+            vnode->setDataSize( this->batch_size, this->hidden_layers_neurons[i] ); // ans
+            vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+        }
+        
 
-void CoalaMlpModel::saveToFile(std::string filename)
-{
-    //打开文件
-    FILE *fp = fopen(filename.c_str(), "w");
+        
+        if(vnode = dynamic_cast<Variable*>(this->graph->getNode(i*8+8).get()))
+        {
+            vnode->setDataSize( this->batch_size, this->hidden_layers_neurons[i] ); // ans
+            vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+        }
+            
+    }
+
+    //输出层
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+2).get()))
+    {
+        vnode->setDataSize( dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8).get())->getDataCols(), this->output_layer_neurons); // W
+        vnode->setInitializationFunction(this->initialization_func);
+    }
+        
+
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+3).get()))
+    {
+        vnode->setDataSize( this->batch_size, this->output_layer_neurons); // ans
+        vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+    }
     
-    //文件首先保存模型层数数据
-    fprintf(fp, "1 %d 1\n", this->hidden_layers_count);
-    //每层用7个%分割
-    fprintf(fp, "%%%%%%%%");
-    //文件然后保存模型输入层神经元数
-    fprintf(fp, "%d\n", this->input_layer->getNeuronsNum());
-    //每层用7个%分割
-    fprintf(fp, "%%%%%%%%\n");
-    //文件其次开始保存模型隐藏层数据
-    for(int i=0; i<this->hidden_layers_count; i++)
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+5).get()))
     {
-        fprintf(fp, "%d %d %d\n", this->hidden_layers[i]->getInputSize(), this->hidden_layers[i]->getOutputSize(), this->hidden_layers[i]->getActivation());
-        for(int j=0; j<this->hidden_layers[i]->getOutputSize(); j++)
-        {
-            for(int k=0; k<this->hidden_layers[i]->getInputSize(); k++)
-            {
-                fprintf(fp, "%f ", this->hidden_layers[i]->getWeights()[j*this->hidden_layers[i]->getInputSize()+k]);
-            }
-            fprintf(fp, "\n");
-        }
-        for(int j=0; j<this->hidden_layers[i]->getOutputSize(); j++)
-        {
-            fprintf(fp, "%f ", this->hidden_layers[i]->getBiases()[j]);
-        }
-        fprintf(fp, "\n");
-        //每层用7个%分割
-        fprintf(fp, "%%%%%%%%\n");
+        vnode->setDataSize( this->batch_size, this->output_layer_neurons); // B
+        vnode->setInitializationFunction(this->initialization_func);
     }
+        
 
-    //文件最后开始保存模型输出层数据
-    fprintf(fp, "%d %d %d\n", this->output_layer->getFeaturesNum(), this->output_layer->getNeuronsNum(),this->output_layer->getActivation());
-    for(int j=0; j<this->output_layer->getNeuronsNum(); j++)
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+6).get()))
     {
-        for(int k=0; k<this->output_layer->getFeaturesNum(); k++)
-        {
-            fprintf(fp, "%f ", this->output_layer->getWeights()[j*this->output_layer->getFeaturesNum()+k]);
-        }
-        fprintf(fp, "\n");
+        vnode->setDataSize( this->batch_size, this->output_layer_neurons); // ans
+        vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
     }
-    for(int j=0; j<this->output_layer->getNeuronsNum(); j++)
-    {
-        fprintf(fp, "%f ", this->output_layer->getBiases()[j]);
-    }
-    fprintf(fp, "\n");
-
-
-    //关闭文件
-    fclose(fp);
     
-    return;
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+8).get()))
+    {
+        vnode->setDataSize( this->batch_size, this->output_layer_neurons); // ans
+        vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+    }
+
+    //损失
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+8+2).get()))
+    {
+        vnode->setDataSize( this->batch_size, this->output_layer_neurons); // 真实值
+        vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+    }
+        
+
+    if(vnode = dynamic_cast<Variable*>(this->graph->getNode(this->hidden_layers_count*8+8+3).get()))
+    {
+        switch(this->cost_func)
+        {
+            case COALA_MLP_LOSS_MSE:
+                vnode->setDataSize(1,1); // 损失
+                vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+                break;
+            case COALA_MLP_LOSS_CROSS_ENTROPY:
+                vnode->setDataSize(1,1); // 损失
+                vnode->setInitializationFunction(COALA_MLP_INITIALIZATION_ZERO);
+                break;
+            default:
+                break;
+        }
+    }
+    
+
+
+    //---------------------------------------------------------------------
+    // OperatorActivation 设置
+    //---------------------------------------------------------------------
+    OperatorActivation * anode;
+
+    //隐含层
+    for(int i=0;i<this->hidden_layers_count;i++)
+    {
+        if(anode = dynamic_cast<OperatorActivation*>(this->graph->getNode(i*8+7).get()))
+        {
+            anode->setActivationFunc(this->hidden_layer_activation_funcs[i]);
+        }
+    }
+    
+    if(anode = dynamic_cast<OperatorActivation*>(this->graph->getNode(this->hidden_layers_count*8+7).get()))
+    {
+        anode->setActivationFunc(this->output_layer_activation_func);
+    }
+
+    this->graph->activating();
+    return 0;
 }

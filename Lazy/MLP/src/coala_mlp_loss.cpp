@@ -30,3 +30,28 @@ void coala_mlp_smse_grad(float * MatGrad, float * MatPred, float * MatReal, int 
 
     return;
 }
+
+float coala_mlp_cost(COALA_MLP_LOSS losstype, float * MatPred, float * MatReal, int RowDim, int ColDim)
+{
+    switch (losstype)
+    {
+        case COALA_MLP_LOSS_MSE:
+            return coala_mlp_smse(MatPred, MatReal, RowDim, ColDim);
+        default:
+            return 0;
+    }
+    return 0;
+}
+
+void coala_mlp_costGrad(COALA_MLP_LOSS losstype, float * MatGrad, float * MatPred, float * MatReal, int RowDim, int ColDim)
+{
+    switch (losstype)
+    {
+        case COALA_MLP_LOSS_MSE:
+            coala_mlp_smse_grad(MatGrad, MatPred, MatReal, RowDim, ColDim);
+            break;
+        default:
+            break;
+    }
+    return;
+}

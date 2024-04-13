@@ -7,7 +7,15 @@
 //----------------------------------------------------------------------------------------------
 #include <cstddef>
 
-
+//X->Y
+int coala_mlp_scopy
+(
+    size_t n, //向量的元素数量
+    float * X, 
+    size_t incx, 
+    float * Y, 
+    size_t incy
+);
 
 int coala_mlp_sgemm
 (

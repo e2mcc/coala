@@ -3,9 +3,34 @@
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_blas.h"
 #include <cstddef>
+#include <string.h>
 
 
-
+int coala_mlp_scopy
+(
+    size_t n, //向量的元素数量
+    float * X, 
+    size_t incx, 
+    float * Y, 
+    size_t incy
+)
+{
+    if(incx == 1 && incy == 1)
+    {
+        memcpy(Y, X, n*sizeof(float));
+    }
+    else
+    {
+        size_t xidx = 0;
+        size_t yidx = 0;
+        for(size_t count = 0; count<n; count++)
+        {
+            Y[yidx] = X[xidx];
+            yidx += incy;
+            xidx += incx;
+        }
+    }
+}
 
 int coala_mlp_sgemm
 (
