@@ -26,6 +26,10 @@ typedef enum
 //----------------------------------------------------------------------------------------------
 // Functions
 //----------------------------------------------------------------------------------------------
+int coala_mlp_activation(COALA_MLP_ACTIVATION const activation_rank, float * output, float * input, int const rows, int const cols);
+
+
+
 int coala_mlp_ssigmoid(float * output, float * input, int size);
 int coala_mlp_dsigmoid(double * output, double * input, int size);
 int coala_mlp_ssigmoid_gradient(float * output, float * input, int size);

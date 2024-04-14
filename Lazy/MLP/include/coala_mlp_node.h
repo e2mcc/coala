@@ -54,6 +54,7 @@ class Operator : public Node
 
     virtual void activating(void) = 0;
     virtual void forward(void) = 0;
+    virtual void backward(void) = 0;
 };
 
 // 加法操作
@@ -69,6 +70,7 @@ class OperatorAdd : public Operator
     void activating(void) override;
 
     void forward(void) override;
+    void backward(void) override;
 };
 
 // 点乘操作
@@ -84,6 +86,7 @@ class OperatorDot : public Operator
     void activating(void) override;
 
     void forward(void) override;
+    void backward(void) override;
 
 };
 
@@ -103,6 +106,7 @@ class OperatorActivation : public Operator
 
     void activating(void) override;
     void forward(void) override;
+    void backward(void) override;
 };
 
 // 损失函数操作
@@ -121,6 +125,7 @@ class OperatorCost: public Operator
 
     void activating(void) override;
     void forward(void) override;
+    void backward(void) override;
 };
 
 //----------------------------------------------------------------------------------------------

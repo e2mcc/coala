@@ -33,10 +33,23 @@ int CoalaMlpGraph::getNodesSize()
     return this->nodes.size();
 }
 
-void CoalaMlpGraph::addNode(std::shared_ptr<Node> node)
-{
+void CoalaMlpGraph::addNode(std::shared_ptr<Node> node, bool isXinput=false, bool isYinput=false)
+{   
+    //输入正确性检查
+    if(isXinput && isYinput) return;
+    if( (isXinput || isYinput) && typeid(node)!=typeid(Variable) ) return;
+
     this->nodes.push_back(node);
     
+    if(isXinput)
+    {
+        this->input_features_nodeid = this->nodes.size()-1;
+    }
+    else if(isYinput)
+    {
+        this->input_lables_nodeid = this->nodes.size()-1;
+    }
+
     if(typeid(node)==typeid(Variable))
     {
         this->nodetypes[this->nodes.size()-1] = 0;

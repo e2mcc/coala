@@ -26,6 +26,8 @@ class CoalaMlpGraph
 
     private:
     std::vector<std::shared_ptr<Node>> nodes;
+    int input_lables_nodeid;
+    int input_features_nodeid;
     std::vector<int> nodetypes;
     int forward_mat_dimension;
     std::vector<int> forward_mat; //row-major
@@ -41,11 +43,14 @@ class CoalaMlpGraph
     
     std::shared_ptr<Node> getNode(int const id);
     int getNodesSize();
-    void addNode(std::shared_ptr<Node> node);
+    void addNode(std::shared_ptr<Node> node, bool isXinput=false, bool isYinput=false);
     void setForwardEdge(int const source, int const dest);
     void setBackwardEdge(int const source, int const dest);
     void activating();
     
+    void setInputExampleFeatures(float * data);
+    void setInputExampleLables(float * data);
+
     void forward();
     void backward();
 

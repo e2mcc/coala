@@ -143,34 +143,15 @@ void OperatorActivation::forward(void)
 {
     Variable * vnodeA = dynamic_cast<Variable*>(this->forward_input_nodes[0].get());
     Variable * vnodeB = dynamic_cast<Variable*>(this->forward_output_nodes[0].get());
-    switch(this->activation_func)
+    if(this->activation_func == COALA_MLP_ACTIVATION_NONE)
     {
-        case COALA_MLP_ACTIVATION_NONE:
-            coala_mlp_scopy(vnodeA->getDataRows()*vnodeA->getDataCols(), vnodeA->getMetaData(), 1, vnodeB->getMetaData(), 1);
-            break;
-        
-        case COALA_MLP_ACTIVATION_SIGMOID:
-            coala_mlp_ssigmoid(vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows()*vnodeA->getDataCols());
-            break;
-
-        case COALA_MLP_ACTIVATION_TANH:
-            coala_mlp_stanh(vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows()*vnodeA->getDataCols());
-            break;
-
-        case COALA_MLP_ACTIVATION_RELU:
-            coala_mlp_srelu(vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows()*vnodeA->getDataCols());
-            break;
-
-        case COALA_MLP_ACTIVATION_LEAKY_RELU:
-            coala_mlp_sleakyrelu(vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows()*vnodeA->getDataCols());
-            break;
-
-        case COALA_MLP_ACTIVATION_SOFTMAX:
-            coala_mlp_ssoftmax(vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows(), vnodeA->getDataCols());
-            break;
-        default:
-            return;
+        coala_mlp_scopy(vnodeA->getDataRows()*vnodeA->getDataCols(), vnodeA->getMetaData(), 1, vnodeB->getMetaData(), 1);
     }
+    else
+    {
+        coala_mlp_activation(this->activation_func, vnodeB->getMetaData(), vnodeA->getMetaData(), vnodeA->getDataRows(), vnodeA->getDataCols());
+    }
+    return;
 }
 
 //-----------------------------------------------------------------------

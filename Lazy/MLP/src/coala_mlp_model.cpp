@@ -29,7 +29,7 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph = std::make_shared<CoalaMlpGraph>(total_nodes_count);
     
     //输入层：输入数据的节点
-    this->graph->addNode(std::make_shared<Variable>(0));
+    this->graph->addNode(std::make_shared<Variable>(0),true,false);
 
 
     //隐含层
@@ -108,7 +108,7 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->setForwardEdge(hidden_layers_count*8+8,hidden_layers_count*8+8+1);
     this->graph->setBackwardEdge(hidden_layers_count*8+8+1,hidden_layers_count*8+8);
 
-    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+8+2)); // 真实值
+    this->graph->addNode(std::make_shared<Variable>(hidden_layers_count*8+8+2),false,true); // 真实值
     this->graph->setForwardEdge(hidden_layers_count*8+8+2,hidden_layers_count*8+8+1);
     this->graph->setBackwardEdge(hidden_layers_count*8+8+1,hidden_layers_count*8+8+2);
     
