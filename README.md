@@ -64,4 +64,4 @@ make xdemo
 ```
 
 ## MLP is being reconstructed
-Currently, the MLP subproject is being reconstructed, with the reformation centered around the concept of a computational graph. It is expected to be completed by June.
+In order to make it more convenient for lab partners to custom-build lightweight neural network models that can be embedded into compilers, and to serve as basic learning material for neural network frameworks, the MLP subproject is being reconstructed with a focus on the computational graph concept.

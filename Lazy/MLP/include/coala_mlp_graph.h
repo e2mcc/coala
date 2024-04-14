@@ -7,6 +7,7 @@
 #include "coala_mlp_node.h"
 #include "coala_mlp_node_op.h"
 #include "coala_mlp_node_var.h"
+#include "coala_mlp_initialization.h"
 #include <string>
 #include <vector>
 
@@ -34,14 +35,30 @@ class CoalaMlpGraph
     // 用户自定义命名的节点编号
     std::vector<int> user_named_forward_node_ids;
     
+    // 用户自定义的变量节点的行列数
+    std::vector<int> planning_forward_nodeva_rows;
+    std::vector<int> planning_forward_nodeva_cols;
+    // 用户自定义的变量节点的初始化函数
+    std::vector<COALA_MLP_INITIALIZATION> planning_forward_nodeva_initfuncs;
+
+    // 用户自定义的操作节点的操作函数
+    std::vector<int> planning_forward_nodeop_funcs;
+
+    // 用户自定义的节点关系
     std::vector<int> planning_forward_graphmat;
 
     public:
-    /// @brief 添加计划构建的正向传播图的节点
-    int addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id);
+    /// @brief 添加计划构建的正向传播图的操作节点
+    int addPlanningForwardNodeOp(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, int const op_func=-1);
+    /// @brief 添加计划构建的正向传播图的变量节点
+    int addPlanningForwardNodeVa(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func=COALA_MLP_INITIALIZATION_ZERO);
     /// @brief 添加计划构建的正向传播图的节点关系
     int addPlanningForwardEdge(int const source_id, int const dest_id);
     
+    /// @brief 更新计划构建的正向传播图的操作节点
+    int updatePlanningForwardNodeOp(int const user_named_node_id, COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const op_func=-1);
+    /// @brief 更新计划构建的正向传播图的变量节点
+    int updatePlanningForwardNodeVa(int const user_named_node_id, COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func=COALA_MLP_INITIALIZATION_ZERO);
 
 
     //--------------------------------------------------------------------
@@ -50,9 +67,10 @@ class CoalaMlpGraph
     private:
     std::vector<std::shared_ptr<Node>> nodes;
     
-    int Constructing(void);
+    int constructing(void);
+
     public:
-   
+
     void activating(void);
     
     
