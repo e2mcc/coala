@@ -1,8 +1,9 @@
 # COALA 
 <img src="Doc/Image/The koala maintains its whimsic-DALL·E.png" alt="Alt text" width="400"/>
 
-**COALA**: A **Co**mpiler-Assisted **A**daptive **L**ibrary Routines **A**llocation Framework for Heterogeneous Systems
+[**COALA**: A **Co**mpiler-Assisted **A**daptive **L**ibrary Routines **A**llocation Framework for Heterogeneous Systems](https://www.computer.org/csdl/journal/tc/5555/01/10495065/1W0tZ46O0Ja)
 
+DOI Bookmark: 10.1109/TC.2024.3385269
 
 ## Requirements
 ### Platform
@@ -62,3 +63,5 @@ make xdemo
 ./xdemo 3 4 5
 ```
 
+## MLP is being reconstructed
+Currently, the MLP subproject is being reconstructed, with the reformation centered around the concept of a computational graph. It is expected to be completed by June.
