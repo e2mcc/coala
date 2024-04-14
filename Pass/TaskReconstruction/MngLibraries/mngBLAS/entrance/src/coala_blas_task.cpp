@@ -65,7 +65,7 @@ Value * CoalaBlasTask::getRoutineParam(std::string param_name)
 /************************************************
 * Class: CoalaBlasTaskFactory
 *************************************************/
-//TODO:完成根据具体的routine创建具体的CoalaBlasTask子类实例
+
 std::shared_ptr<CoalaBlasTask> CoalaBlasTaskFactory::createACoalaBlasTask(CallInst * CI, COALA_BLAS_ROUTINES_CODE const namecode, size_t const taskid)
 {
     switch(namecode)

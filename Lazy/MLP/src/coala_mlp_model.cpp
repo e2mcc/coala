@@ -27,7 +27,7 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph = std::make_shared<CoalaMlpGraph>();
     
     //加入输入节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 0);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_INPUT, 0);
     
 
     //加入隐藏层的相关节点
@@ -38,11 +38,11 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
         this->graph->addPlanningForwardEdge(i, i+1);
 
         //加入隐藏层权重W节点
-        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, i+2);
+        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_WEIGHT, i+2);
         this->graph->addPlanningForwardEdge(i+2, i+1);
 
         //加入ans节点
-        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, i+3);
+        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, i+3);
         this->graph->addPlanningForwardEdge(i+1, i+3);
 
         //加入隐藏层计算节点 plus
@@ -50,11 +50,11 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
         this->graph->addPlanningForwardEdge(i+3, i+4);
 
         //加入隐藏层权重B节点
-        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, i+5);
+        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_WEIGHT, i+5);
         this->graph->addPlanningForwardEdge(i+5, i+4);
         
         //加入ans节点
-        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, i+6);
+        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, i+6);
         this->graph->addPlanningForwardEdge(i+4, i+6);
 
         //加入隐藏层激活函数节点
@@ -62,7 +62,7 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
         this->graph->addPlanningForwardEdge(i+6, i+7);
 
         //加入ans节点
-        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, i+8);
+        this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, i+8);
         this->graph->addPlanningForwardEdge(i+7, i+8);
     }
 
@@ -72,11 +72,11 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count, 8*this->hidden_layers_count+1);
 
     //加入输出层权重W节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+2);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_WEIGHT, 8*this->hidden_layers_count+2);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+2, 8*this->hidden_layers_count+1);
 
     //加入ans节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+3);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, 8*this->hidden_layers_count+3);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+1, 8*this->hidden_layers_count+3);
 
     //加入输出层计算节点 plus
@@ -84,11 +84,11 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+3, 8*this->hidden_layers_count+4);
 
     //加入输出层权重B节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+5);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_WEIGHT, 8*this->hidden_layers_count+5);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+5, 8*this->hidden_layers_count+4);
 
     //加入ans节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+6);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, 8*this->hidden_layers_count+6);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+4, 8*this->hidden_layers_count+6);
 
     //加入输出层激活函数节点
@@ -96,7 +96,7 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+6, 8*this->hidden_layers_count+7);
 
     //加入ans节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+8);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, 8*this->hidden_layers_count+8);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+7, 8*this->hidden_layers_count+8);
 
 
@@ -106,11 +106,11 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+8, 8*this->hidden_layers_count+9);
 
     //加入输出层的损失计算的真实值节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+10);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_INPUT, 8*this->hidden_layers_count+10);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+10, 8*this->hidden_layers_count+9);
 
     //加入输出层的损失计算的ans节点
-    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_NODE_VARIABLE, 8*this->hidden_layers_count+11);
+    this->graph->addPlanningForwardNode(COALA_MLP_GRAPH_VARIABLE_ANS, 8*this->hidden_layers_count+11);
     this->graph->addPlanningForwardEdge(8*this->hidden_layers_count+9, 8*this->hidden_layers_count+11);
 
     return;

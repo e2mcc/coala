@@ -36,25 +36,24 @@ class CoalaMlpGraph
     
     std::vector<int> planning_forward_graphmat;
 
-    // 记录输入节点
-    int inputX_id;
-    int inputY_id;
-
     public:
-    /// @brief 添加计划构建正向图的节点
-    int addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, bool is_inputX=false, bool is_inputY=false);
+    /// @brief 添加计划构建的正向传播图的节点
+    int addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id);
+    /// @brief 添加计划构建的正向传播图的节点关系
     int addPlanningForwardEdge(int const source_id, int const dest_id);
     
 
 
     //--------------------------------------------------------------------
-    // 本图根据用户计划进行正式构建(通过 activating() 启动正式构建)
+    // 本图根据用户计划进行正式构建( 通过 activating() 启动 )
     //--------------------------------------------------------------------
     private:
     std::vector<std::shared_ptr<Node>> nodes;
     
+    int Constructing(void);
     public:
-    void activating();
+   
+    void activating(void);
     
     
     

@@ -8,13 +8,12 @@ CoalaMlpGraph::CoalaMlpGraph()
     planning_forward_graphmat.resize(400, 0);
 }
 
-
-int CoalaMlpGraph::addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, bool is_inputX=false, bool is_inputY=false)
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 用户: 计划构建
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+int CoalaMlpGraph::addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id)
 {   
     if(user_named_node_id<0) return 1;
-    if(is_inputX && is_inputY) return 2;
-    if(is_inputX && isVariable(node_type_code)==false) return 3;
-    if(is_inputY && isVariable(node_type_code)==false) return 3;
 
     // 检查用户是否已经添加了这个id名
     for(int i=0; i<this->user_named_forward_node_ids.size(); i++)
@@ -24,16 +23,6 @@ int CoalaMlpGraph::addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const n
 
     this->planning_forward_nodes.push_back(node_type_code);
     this->user_named_forward_node_ids.push_back(user_named_node_id);
-    
-    if(is_inputX)
-    {
-        this->inputX_id = this->planning_forward_nodes.size() - 1;
-    }
-
-    if(is_inputY)
-    {
-        this->inputY_id = this->planning_forward_nodes.size() - 1;
-    }
 
     return 0;
 }
@@ -95,6 +84,22 @@ int CoalaMlpGraph::addPlanningForwardEdge(int const source_id, int const dest_id
 
     return 0;
 }
+
+
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 正式构建
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+int CoalaMlpGraph::Constructing(void)
+{
+    for(int i=0; i<this->planning_forward_nodes.size(); i++)
+    {
+       
+    }
+
+    return 0;
+}
+
 
 
 

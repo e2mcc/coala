@@ -20,19 +20,19 @@ namespace mlp {
 
 //----------------------------------------------------------------------------------------------
 // Node Type Code
-//   _____________________________________________
-//   |   x   |   x   |   x   |    x    |    x    |
-//   ---------------------------------------------
-//   |  OP   |     Type      | Compute and Grad  |
-//   |  VAR  |     Type      |                   |
-//   ---------------------------------------------
+//   ____________________________________________________________
+//   |  万位  |     千位     |     百位      |   十位   |   个位   |
+//   --------|-----------------------------|--------------------|
+//   |  OP   |  Cost/Activate/Plus/Matmul  |  Compute and Grad  |
+//   |  VAR  |      Weight/Ans/Input       |                    |
+//   ------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------
 typedef enum
 {   
     //Node
     COALA_MLP_GRAPH_NODE = 0,
-    COALA_MLP_GRAPH_NODE_OP = 1,
+    COALA_MLP_GRAPH_NODE_OPERATOR = 1,
     COALA_MLP_GRAPH_NODE_VARIABLE = 2,
     
 
@@ -60,13 +60,22 @@ typedef enum
     COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD1ST      = 10401,
     COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD2ND      = 10402,
 
+    // Variable Weight
+    COALA_MLP_GRAPH_VARIABLE_WEIGHT = 201,
+
+    // Variable Ans
+    COALA_MLP_GRAPH_VARIABLE_ANS = 202,
+    
+    // Variable Input
+    COALA_MLP_GRAPH_VARIABLE_INPUT = 203,
+
 }COALA_MLP_GRAPH_NODE_TYPE_CODE;
 
 bool isOperator(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
 bool isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
 
 //----------------------------------------------------------------------------------------------
-// Node
+// Node: TypeCode is 0
 //----------------------------------------------------------------------------------------------
 class Node
 {
@@ -74,6 +83,11 @@ class Node
 };
 
 
+class CoalaMlpGraphNodeFactory
+{
+	public:
+    static std::shared_ptr<Node> createACoalaMlpGraphNode( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
+};
 
 
 }//end of namespace mlp
