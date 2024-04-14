@@ -5,6 +5,8 @@
 // Includes
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_node.h"
+#include "coala_mlp_node_op.h"
+#include "coala_mlp_node_var.h"
 #include <string>
 #include <vector>
 
@@ -20,39 +22,52 @@ namespace mlp {
 //----------------------------------------------------------------------------------------------
 class CoalaMlpGraph
 {
-    protected:
-    CoalaMlpGraph() {}
+    public:
+    CoalaMlpGraph();
 
-
+    //--------------------------------------------------------------------
+    // 用户: 计划构建
+    //--------------------------------------------------------------------
     private:
-    std::vector<std::shared_ptr<Node>> nodes;
-    int input_lables_nodeid;
-    int input_features_nodeid;
-    std::vector<int> nodetypes;
-    int forward_mat_dimension;
-    std::vector<int> forward_mat; //row-major
-    int backward_mat_dimension;
-    std::vector<int> backward_mat; //row-major
+    std::vector<COALA_MLP_GRAPH_NODE_TYPE_CODE> planning_forward_nodes;
+    
+    // 用户自定义命名的节点编号
+    std::vector<int> user_named_forward_node_ids;
+    
+    std::vector<int> planning_forward_graphmat;
 
+    // 记录输入节点
+    int inputX_id;
+    int inputY_id;
 
     public:
-    virtual ~CoalaMlpGraph() {}
-
-    //构造函数
-    CoalaMlpGraph(int const nodes_count);
+    /// @brief 添加计划构建正向图的节点
+    int addPlanningForwardNode(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, bool is_inputX=false, bool is_inputY=false);
+    int addPlanningForwardEdge(int const source_id, int const dest_id);
     
-    std::shared_ptr<Node> getNode(int const id);
-    int getNodesSize();
-    void addNode(std::shared_ptr<Node> node, bool isXinput=false, bool isYinput=false);
-    void setForwardEdge(int const source, int const dest);
-    void setBackwardEdge(int const source, int const dest);
+
+
+    //--------------------------------------------------------------------
+    // 本图根据用户计划进行正式构建(通过 activating() 启动正式构建)
+    //--------------------------------------------------------------------
+    private:
+    std::vector<std::shared_ptr<Node>> nodes;
+    
+    public:
     void activating();
     
-    void setInputExampleFeatures(float * data);
-    void setInputExampleLables(float * data);
+    
+    
 
-    void forward();
-    void backward();
+
+
+
+    //--------------------------------------------------------------------
+    // 执行
+    //--------------------------------------------------------------------
+    public:
+    /// @brief 激活计算图(激活后可进行正反传播计算)
+    
 
 };
 
