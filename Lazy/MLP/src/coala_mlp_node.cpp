@@ -4,7 +4,7 @@
 
 
 using namespace coala::mlp;
-bool isOperator(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
+bool coala::mlp::isOperator(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
 {
     //获得最高位置的数字
     int type = node_type_code;
@@ -23,7 +23,7 @@ bool isOperator(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
     }
 }
 
-bool isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
+bool coala::mlp::isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
 {
     //获得最高位置的数字
     int type = node_type_code;
@@ -45,8 +45,12 @@ bool isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
 /*====================================================================
 | CoalaMlpGraphNodeFactory
 ======================================================================*/
-std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
+std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code,int const op_func)
 {
+    if(!isOperator(node_type_code))
+    {
+        return nullptr;
+    }
     switch(node_type_code)
     {
         //Operator Cost
@@ -77,6 +81,23 @@ std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode( COALA_
         case COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD2ND:   
             return std::make_shared<OperatorMatmulGrad2nd>();
         
+        default:
+            return nullptr;
+    }
+    return nullptr;
+}
+
+
+
+
+std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func)
+{
+    if(!isVariable(node_type_code))
+    {
+        return nullptr;
+    }
+    switch(node_type_code)
+    {   
         //Variable Weight
         case COALA_MLP_GRAPH_VARIABLE_WEIGHT:
             return std::make_shared<VariableWeight>();

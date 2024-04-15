@@ -86,7 +86,8 @@ class Node
 class CoalaMlpGraphNodeFactory
 {
 	public:
-    static std::shared_ptr<Node> createACoalaMlpGraphNode( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
+    static std::shared_ptr<Node> createACoalaMlpGraphNodeOp( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const op_func);
+    static std::shared_ptr<Node> createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func);
 };
 
 

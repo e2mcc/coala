@@ -170,50 +170,51 @@ int CoalaMlpGraph::updatePlanningForwardNodeVa(int const user_named_node_id, COA
 //TODO:
 int CoalaMlpGraph::constructing(void)
 {
+    //---------------------------------------------------------------
+    // 先构造一遍计算节点
+    //---------------------------------------------------------------
     for(int i=0; i<this->planning_forward_nodes.size(); i++)
     {
         // 创建节点
         switch (this->planning_forward_nodes[i])
         {
             case COALA_MLP_GRAPH_OPERATOR_COST:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_COST_COMPUTE));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_COST_GRAD));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(COALA_MLP_GRAPH_OPERATOR_COST_COMPUTE, this->planning_forward_nodeop_funcs[i]));
                 break;
             
             case COALA_MLP_GRAPH_OPERATOR_ACTIVATE:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_ACTIVATE_COMPUTE));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_ACTIVATE_GRAD));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(COALA_MLP_GRAPH_OPERATOR_ACTIVATE_COMPUTE, this->planning_forward_nodeop_funcs[i]));
                 break;
             
             case COALA_MLP_GRAPH_OPERATOR_MATMUL:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_MATMUL_COMPUTE));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD1ST));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD2ND));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(COALA_MLP_GRAPH_OPERATOR_MATMUL_COMPUTE, this->planning_forward_nodeop_funcs[i]));
                 break;
 
             case COALA_MLP_GRAPH_OPERATOR_PLUS:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_PLUS_COMPUTE));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_PLUS_GRAD1ST));
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_OPERATOR_PLUS_GRAD2ND));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(COALA_MLP_GRAPH_OPERATOR_PLUS_COMPUTE, this->planning_forward_nodeop_funcs[i]));
                 break;
             
             case COALA_MLP_GRAPH_VARIABLE_INPUT:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_VARIABLE_INPUT));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(COALA_MLP_GRAPH_VARIABLE_INPUT, 
+                                        this->planning_forward_nodeva_rows[i], this->planning_forward_nodeva_cols[i], this->planning_forward_nodeva_initfuncs[i]));
                 break;
 
             case COALA_MLP_GRAPH_VARIABLE_WEIGHT:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_VARIABLE_WEIGHT));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(COALA_MLP_GRAPH_VARIABLE_WEIGHT,
+                                        this->planning_forward_nodeva_rows[i], this->planning_forward_nodeva_cols[i], this->planning_forward_nodeva_initfuncs[i]));
                 break;
 
             case COALA_MLP_GRAPH_VARIABLE_ANS:
-                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNode(COALA_MLP_GRAPH_VARIABLE_ANS));
+                this->nodes.push_back(CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(COALA_MLP_GRAPH_VARIABLE_ANS,
+                                        this->planning_forward_nodeva_rows[i], this->planning_forward_nodeva_cols[i], this->planning_forward_nodeva_initfuncs[i]));
                 break;
 
             default:
                 break;
         }
-
     }
+    //建立节点关系
+
 
     return 0;
 }
