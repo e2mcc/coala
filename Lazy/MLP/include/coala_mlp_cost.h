@@ -1,5 +1,5 @@
-#ifndef COALA_MLOP_LOSS_H
-#define COALA_MLOP_LOSS_H
+#ifndef COALA_MLOP_COST_H
+#define COALA_MLOP_COST_H
 
 
 //----------------------------------------------------------------------------------------------
@@ -14,9 +14,9 @@
 
 typedef enum
 {
-    COALA_MLP_LOSS_NONE             = 0,
-    COALA_MLP_LOSS_MSE              = 1,
-    COALA_MLP_LOSS_CROSS_ENTROPY    = 2
+    COALA_MLP_COST_NONE             = 0,
+    COALA_MLP_COST_MSE              = 1,
+    COALA_MLP_COST_CROSS_ENTROPY    = 2
 }COALA_MLP_COST;
 
 
@@ -27,4 +27,4 @@ void coala_mlp_smse_grad(float * MatGrad, float * MatPred, float * MatReal, int 
 float coala_mlp_cost(COALA_MLP_COST cost_func_rank, float * MatPred, float * MatReal, int RowDim, int ColDim);
 void coala_mlp_costGrad(COALA_MLP_COST cost_func_rank, float * MatGrad, float * MatPred, float * MatReal, int RowDim, int ColDim);
 
-#endif // COALA_MLOP_LOSS_H
+#endif // COALA_MLOP_COST_H

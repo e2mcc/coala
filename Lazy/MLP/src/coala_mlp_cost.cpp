@@ -35,7 +35,7 @@ float coala_mlp_cost(COALA_MLP_COST cost_func_rank, float * MatPred, float * Mat
 {
     switch (cost_func_rank)
     {
-        case COALA_MLP_LOSS_MSE:
+        case COALA_MLP_COST_MSE:
             return coala_mlp_smse(MatPred, MatReal, RowDim, ColDim);
         default:
             return 0;
@@ -47,7 +47,7 @@ void coala_mlp_costGrad(COALA_MLP_COST cost_func_rank, float * MatGrad, float * 
 {
     switch (cost_func_rank)
     {
-        case COALA_MLP_LOSS_MSE:
+        case COALA_MLP_COST_MSE:
             coala_mlp_smse_grad(MatGrad, MatPred, MatReal, RowDim, ColDim);
             break;
         default:
