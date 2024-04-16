@@ -8,8 +8,8 @@
 #include <vector>
 #include "coala_mlp_graph.h"
 #include "coala_mlp_cost.h"
-#include "coala_mlp_activation.h"
-#include "coala_mlp_initialization.h"
+#include "coala_mlp_activate.h"
+#include "coala_mlp_initialize.h"
 //----------------------------------------------------------------------------------------------
 // Namespace
 //----------------------------------------------------------------------------------------------
@@ -45,13 +45,13 @@ class CoalaMLP
     COALA_MLP_COST cost_func;
 
     /// @brief 隐藏层激活函数
-    std::vector<COALA_MLP_ACTIVATION> hidden_layer_activate_funcs;
+    std::vector<COALA_MLP_ACTIVATE_FUNC> hidden_layer_activate_funcs;
 
     /// @brief 输出层激活函数
-    COALA_MLP_ACTIVATION output_layer_activate_func;
+    COALA_MLP_ACTIVATE_FUNC output_layer_activate_func;
 
     /// @brief 内部权重初始化函数
-    COALA_MLP_INITIALIZATION initialize_func;
+    COALA_MLP_INITIALIZE_FUNC initialize_func;
 
     /// @brief 计算图
     std::shared_ptr<CoalaMlpGraph> graph;
@@ -62,9 +62,9 @@ class CoalaMLP
     int setHiddenLayersNeurons(int const layer, int const neurons);
     int setTraningBatch(int const batch_size);
     int setCostFunc(COALA_MLP_COST const cost_func);
-    int setInitializeFunc(COALA_MLP_INITIALIZATION const initialize_func);
-    int setHiddenLayerActivateFunc(int const hidden_layer, COALA_MLP_ACTIVATION const activate_func);
-    int setOutputLayerActivateFunc(COALA_MLP_ACTIVATION const activate_func);
+    int setInitializeFunc(COALA_MLP_INITIALIZE_FUNC const initialize_func);
+    int setHiddenLayerActivateFunc(int const hidden_layer, COALA_MLP_ACTIVATE_FUNC const activate_func);
+    int setOutputLayerActivateFunc(COALA_MLP_ACTIVATE_FUNC const activate_func);
     int readyForTraining(void);
 
 

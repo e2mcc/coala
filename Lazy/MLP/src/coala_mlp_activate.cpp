@@ -1,27 +1,27 @@
 //----------------------------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------------------------
-#include "coala_mlp_activation.h"
+#include "coala_mlp_activate.h"
 #include <cmath>
 
 
-int coala_mlp_activation(COALA_MLP_ACTIVATION const activation_rank, float * output, float * input, int const rows, int const cols)
+int coala_mlp_activation(COALA_MLP_ACTIVATE_FUNC const activation_rank, float * output, float * input, int const rows, int const cols)
 {
     switch(activation_rank)
     {
-        case COALA_MLP_ACTIVATION_SIGMOID:
+        case COALA_MLP_ACTIVATE_SIGMOID:
             coala_mlp_ssigmoid(output, input, rows * cols);
             break;
-        case COALA_MLP_ACTIVATION_TANH:
+        case COALA_MLP_ACTIVATE_TANH:
             coala_mlp_stanh(output, input, rows * cols);
             break;
-        case COALA_MLP_ACTIVATION_RELU:
+        case COALA_MLP_ACTIVATE_RELU:
             coala_mlp_srelu(output, input, rows * cols);
             break;
-        case COALA_MLP_ACTIVATION_LEAKY_RELU:
+        case COALA_MLP_ACTIVATE_LEAKY_RELU:
             coala_mlp_sleakyrelu(output, input, rows * cols);
             break;
-        case COALA_MLP_ACTIVATION_SOFTMAX:
+        case COALA_MLP_ACTIVATE_SOFTMAX:
             coala_mlp_ssoftmax(output, input, rows, cols);
             break;
         default:

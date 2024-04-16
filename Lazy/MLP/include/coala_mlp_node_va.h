@@ -1,13 +1,13 @@
-#ifndef COALA_MLP_NODE_VAR_H
-#define COALA_MLP_NODE_VAR_H
+#ifndef COALA_MLP_NODE_VA_H
+#define COALA_MLP_NODE_VA_H
 
 //----------------------------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_node.h"
 #include "coala_mlp_tensor.h"
-#include "coala_mlp_initialization.h"
-#include "coala_mlp_activation.h"
+#include "coala_mlp_initialize.h"
+#include "coala_mlp_activate.h"
 #include "coala_mlp_cost.h"
 #include <string>
 #include <vector>
@@ -25,6 +25,19 @@ namespace mlp {
 //----------------------------------------------------------------------------------------------
 class Variable : public coala::mlp::Node
 {
+    protected:
+    Variable(){}
+
+    public:
+    sMATRIX_t metadata;
+    int metadata_rows;
+    int metadata_cols;
+    COALA_MLP_INITIALIZE_FUNC init_func;
+
+    virtual int lockin() = 0;
+
+    virtual int setInitFunc(COALA_MLP_INITIALIZE_FUNC const init_func) = 0;
+    virtual int setShape(int const rows, int const cols) = 0;
     
 };
 
@@ -33,7 +46,18 @@ class Variable : public coala::mlp::Node
 //----------------------------------------------------------------------------------------------
 class VariableWeight : public Variable
 {
-    
+    protected:
+    VariableWeight(){}
+
+    private:
+    int setMetaDataRows(int const rows);
+    int setMetaDataCols(int const cols);
+
+    public:
+    VariableWeight(int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func);
+    int setInitFunc(COALA_MLP_INITIALIZE_FUNC const init_func) override;
+    int setShape(int const rows, int const cols) override;
+    int lockin() override;
 };
 
 
@@ -42,6 +66,18 @@ class VariableWeight : public Variable
 //----------------------------------------------------------------------------------------------
 class VariableAns : public Variable
 {
+    protected:
+    VariableAns(){}
+
+    private:
+    int setMetaDataRows(int const rows);
+    int setMetaDataCols(int const cols);
+
+    public:
+    VariableAns(int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func);
+    int setInitFunc(COALA_MLP_INITIALIZE_FUNC const init_func) override;
+    int setShape(int const rows, int const cols) override;
+    int lockin() override;
     
 };
 
@@ -50,7 +86,18 @@ class VariableAns : public Variable
 //----------------------------------------------------------------------------------------------
 class VariableInput : public Variable
 {
-    
+    protected:
+    VariableInput(){}
+
+    private:
+    int setMetaDataRows(int const rows);
+    int setMetaDataCols(int const cols);
+
+    public:
+    VariableInput(int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func);
+    int setInitFunc(COALA_MLP_INITIALIZE_FUNC const init_func) override;
+    int setShape(int const rows, int const cols) override;
+    int lockin() override;
 };
 
 

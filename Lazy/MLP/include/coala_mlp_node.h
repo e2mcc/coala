@@ -5,8 +5,8 @@
 // Includes
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_tensor.h"
-#include "coala_mlp_initialization.h"
-#include "coala_mlp_activation.h"
+#include "coala_mlp_initialize.h"
+#include "coala_mlp_activate.h"
 #include "coala_mlp_cost.h"
 #include <string>
 #include <vector>
@@ -79,7 +79,23 @@ bool isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
 //----------------------------------------------------------------------------------------------
 class Node
 {
+    protected:
+    Node(){}
+    
+    public:
+    //节点序号
+    int rank;
+    //节点类型
+    COALA_MLP_GRAPH_NODE_TYPE_CODE type;
 
+    std::vector<std::shared_ptr<Node>> input_nodes;
+    std::vector<std::shared_ptr<Node>> output_nodes;
+    int setInputNode(std::shared_ptr<Node> const node);
+    int setOutputNode(std::shared_ptr<Node> const node);
+    COALA_MLP_GRAPH_NODE_TYPE_CODE getNodeType(void);
+    int getRank(void);
+
+    virtual int lockin() = 0;
 };
 
 
@@ -87,7 +103,7 @@ class CoalaMlpGraphNodeFactory
 {
 	public:
     static std::shared_ptr<Node> createACoalaMlpGraphNodeOp( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const op_func);
-    static std::shared_ptr<Node> createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func);
+    static std::shared_ptr<Node> createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func);
 };
 
 

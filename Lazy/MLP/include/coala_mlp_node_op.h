@@ -6,8 +6,7 @@
 //----------------------------------------------------------------------------------------------
 #include "coala_mlp_node.h"
 #include "coala_mlp_tensor.h"
-#include "coala_mlp_initialization.h"
-#include "coala_mlp_activation.h"
+#include "coala_mlp_activate.h"
 #include "coala_mlp_cost.h"
 #include <string>
 #include <vector>
@@ -28,6 +27,12 @@ class Operator : public coala::mlp::Node
     protected:
     Operator(){}
 
+    public:
+    virtual int lockin() = 0;
+
+    virtual int setOpFunc(int const op_func) = 0;
+
+    
 };
 
 
@@ -38,23 +43,42 @@ class Operator : public coala::mlp::Node
 //----------------------------------------------------------------------------------------------
 class OperatorCost : public Operator
 {
+    protected:
+    OperatorCost(){}
+
     public:
-    OperatorCost();
-   
+    virtual int lockin() = 0;
+    virtual int setOpFunc(int const op_func) = 0;
 };
 
 // Node Operator Cost Compute: TypeCode is 10100
 class OperatorCostCompute : public OperatorCost
 {
+    protected:
+    OperatorCostCompute(){}
+
     public:
-    OperatorCostCompute();
+    OperatorCostCompute(COALA_MLP_COST const costfunc);
+    int setOpFunc(int const op_func) override;
+    int lockin() override;
+    
+    private:
+    int costfunc;
 };
 
 // Node Operator Cost Grad: TypeCode is 10101
 class OperatorCostGrad : public OperatorCost
 {
+    protected:
+    OperatorCostGrad(){}
+
     public:
-    OperatorCostGrad();
+    OperatorCostGrad(COALA_MLP_COST const costfunc);
+    int setOpFunc(int const op_func) override;
+    int lockin() override;
+
+    private:
+    int costfunc;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -62,23 +86,44 @@ class OperatorCostGrad : public OperatorCost
 //----------------------------------------------------------------------------------------------
 class OperatorActivate : public Operator
 {
+    protected:
+    OperatorActivate(){}
+    
     public:
-    OperatorActivate();
+    virtual int lockin() = 0;
+    virtual int setOpFunc(int const op_func) = 0;
+    
    
 };
 
 // Node Operator Activate Compute: TypeCode is 10200
 class OperatorActivateCompute : public OperatorActivate
 {
+    protected:
+    OperatorActivateCompute(){}
+
     public:
-    OperatorActivateCompute();
+    OperatorActivateCompute(COALA_MLP_ACTIVATE_FUNC const activatefunc);
+    int setOpFunc(int const op_func) override;
+    int lockin() override;
+
+    private:
+    int activatefunc;
 };
 
 // Node Operator Activate Grad: TypeCode is 10201
 class OperatorActivateGrad : public OperatorActivate
 {
+    protected:
+    OperatorActivateGrad(){}
+
     public:
-    OperatorActivateGrad();
+    OperatorActivateGrad(COALA_MLP_ACTIVATE_FUNC const activatefunc);
+    int setOpFunc(int const op_func) override;
+    int lockin() override;
+
+    private:
+    int activatefunc;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -86,8 +131,12 @@ class OperatorActivateGrad : public OperatorActivate
 //----------------------------------------------------------------------------------------------
 class OperatorPlus : public Operator
 {
+    protected:
+    OperatorPlus(){}
+
     public:
-    OperatorPlus();
+    virtual int lockin() = 0;
+    virtual int setOpFunc(int const op_func) = 0;
    
 };
 
@@ -95,21 +144,29 @@ class OperatorPlus : public Operator
 class OperatorPlusCompute : public OperatorPlus
 {
     public:
-    OperatorPlusCompute();
+    OperatorPlusCompute(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
+
 };
 
 // Node Operator Plus Grad1st: TypeCode is 10302
 class OperatorPlusGrad1st : public OperatorPlus
 {
     public:
-    OperatorPlusGrad1st();
+    OperatorPlusGrad1st(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
 };
 
 // Node Operator Plus Grad2nd: TypeCode is 10303
 class OperatorPlusGrad2nd : public OperatorPlus
 {
     public:
-    OperatorPlusGrad2nd();
+    OperatorPlusGrad2nd(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
+
 };
 
 //----------------------------------------------------------------------------------------------
@@ -117,9 +174,13 @@ class OperatorPlusGrad2nd : public OperatorPlus
 //----------------------------------------------------------------------------------------------
 class OperatorMatmul : public Operator
 {
-    public:
-    OperatorMatmul();
+    protected:
+    OperatorMatmul(){}
 
+    public:
+    virtual int lockin() = 0;
+    virtual int setOpFunc(int const op_func) = 0;
+    
 };
 
 
@@ -127,21 +188,27 @@ class OperatorMatmul : public Operator
 class OperatorMatmulCompute : public OperatorMatmul
 {
     public:
-    OperatorMatmulCompute();
+    OperatorMatmulCompute(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
 };
 
 // Node Operator Matmul Grad1st: TypeCode is 10401
 class OperatorMatmulGrad1st : public OperatorMatmul
 {
     public:
-    OperatorMatmulGrad1st();
+    OperatorMatmulGrad1st(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
 };
 
 // Node Operator Matmul Grad2nd: TypeCode is 10402
 class OperatorMatmulGrad2nd : public OperatorMatmul
 {
     public:
-    OperatorMatmulGrad2nd();
+    OperatorMatmulGrad2nd(){}
+    int setOpFunc(int const op_func) override {return 0;}
+    int lockin() override;
 };
 
 

@@ -1,6 +1,6 @@
 #include "coala_mlp_node.h"
 #include "coala_mlp_node_op.h"
-#include "coala_mlp_node_var.h"
+#include "coala_mlp_node_va.h"
 
 
 using namespace coala::mlp;
@@ -43,6 +43,31 @@ bool coala::mlp::isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
 }
 
 /*====================================================================
+| Node
+======================================================================*/
+int Node::setInputNode(std::shared_ptr<Node> const node)
+{
+    this->input_nodes.push_back(node);
+    return 0;
+}
+
+int Node::setOutputNode(std::shared_ptr<Node> const node)
+{
+    return 0;
+}
+
+
+COALA_MLP_GRAPH_NODE_TYPE_CODE Node::getNodeType(void)
+{
+    return this->type;
+}
+int Node::getRank(void)
+{
+    return this->rank;
+
+}
+
+/*====================================================================
 | CoalaMlpGraphNodeFactory
 ======================================================================*/
 std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code,int const op_func)
@@ -55,13 +80,13 @@ std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp( COAL
     {
         //Operator Cost
         case COALA_MLP_GRAPH_OPERATOR_COST_COMPUTE:
-            return std::make_shared<OperatorCostCompute>();
+            return std::make_shared<OperatorCostCompute>(op_func);
         case COALA_MLP_GRAPH_OPERATOR_COST_GRAD:
             return std::make_shared<OperatorCostGrad>();
         
         //Operator Activate
         case COALA_MLP_GRAPH_OPERATOR_ACTIVATE_COMPUTE:
-            return std::make_shared<OperatorActivateCompute>();
+            return std::make_shared<OperatorActivateCompute>(op_func);
         case COALA_MLP_GRAPH_OPERATOR_ACTIVATE_GRAD:
             return std::make_shared<OperatorActivateGrad>();
 
@@ -90,7 +115,7 @@ std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp( COAL
 
 
 
-std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZATION const init_func)
+std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa( COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func)
 {
     if(!isVariable(node_type_code))
     {
@@ -100,15 +125,15 @@ std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa( COAL
     {   
         //Variable Weight
         case COALA_MLP_GRAPH_VARIABLE_WEIGHT:
-            return std::make_shared<VariableWeight>();
+            return std::make_shared<VariableWeight>(rows,cols,init_func);
 
         //Variable Ans
         case COALA_MLP_GRAPH_VARIABLE_ANS:
-            return std::make_shared<VariableAns>();
+            return std::make_shared<VariableAns>(rows,cols,init_func);
 
         //Variable Input
         case COALA_MLP_GRAPH_VARIABLE_INPUT:
-            return std::make_shared<VariableInput>();
+            return std::make_shared<VariableInput>(rows,cols,init_func);
         default:
             return nullptr;
     }

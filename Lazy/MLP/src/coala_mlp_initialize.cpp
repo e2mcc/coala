@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------------------------
-#include "coala_mlp_initialization.h"
+#include "coala_mlp_initialize.h"
 #include <cstdlib>
 #include <cmath>
 #include <string.h>
