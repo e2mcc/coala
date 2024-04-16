@@ -5,17 +5,27 @@
 using namespace coala::mlp;
 
 //----------------------------------------------------------------------------------------------
+// Node Operator
+//----------------------------------------------------------------------------------------------
+void Operator::setOpFunc(int const op_func)
+{
+    this->op_func = op_func;
+    return;
+}
+
+int Operator::getOpFunc(void)
+{
+    return this->op_func;
+}
+
+//----------------------------------------------------------------------------------------------
 // Node Operator Cost
 //----------------------------------------------------------------------------------------------
 OperatorCostCompute::OperatorCostCompute(COALA_MLP_COST const costfunc)
 {
-    this->costfunc = costfunc;
+    setOpFunc(op_func);
 }
 
-int OperatorCostCompute::setOpFunc(int const op_func)
-{
-    this->costfunc = op_func;
-}
 
 
 int OperatorCostCompute::lockin()
@@ -60,26 +70,20 @@ int OperatorCostCompute::lockin()
 
 OperatorCostGrad::OperatorCostGrad(COALA_MLP_COST const costfunc)
 {
-    this->costfunc = costfunc;
+    setOpFunc(costfunc);
 }
 
-int OperatorCostGrad::setOpFunc(int const op_func)
-{
-    this->costfunc = op_func;
-}
+
 
 //----------------------------------------------------------------------------------------------
 // Node Operator Activate
 //----------------------------------------------------------------------------------------------
 OperatorActivateCompute::OperatorActivateCompute(COALA_MLP_ACTIVATE_FUNC const activatefunc)
 {
-    this->activatefunc = activatefunc;
+    setOpFunc(activatefunc);
 }
 
-int OperatorActivateCompute::setOpFunc(int const op_func)
-{
-    this->activatefunc = op_func;
-}
+
 
 int OperatorActivateCompute::lockin()
 {
@@ -109,13 +113,10 @@ int OperatorActivateCompute::lockin()
 
 OperatorActivateGrad::OperatorActivateGrad(COALA_MLP_ACTIVATE_FUNC const activatefunc)
 {
-    this->activatefunc = activatefunc;
+    setOpFunc(activatefunc);
 }
 
-int OperatorActivateGrad::setOpFunc(int const op_func)
-{
-    this->activatefunc = op_func;
-}
+
 
 //----------------------------------------------------------------------------------------------
 // Node Operator Plus

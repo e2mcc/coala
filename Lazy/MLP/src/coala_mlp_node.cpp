@@ -42,6 +42,23 @@ bool coala::mlp::isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
     }
 }
 
+bool coala::mlp::isCompute(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code)
+{
+    //获取个位数字
+    int type = node_type_code;
+    type %= 10;
+    if(type == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+
 /*====================================================================
 | Node
 ======================================================================*/
@@ -56,11 +73,31 @@ int Node::setOutputNode(std::shared_ptr<Node> const node)
     return 0;
 }
 
+std::shared_ptr<Node> Node::getInputNode(int const index)
+{   
+    if(index >= this->input_nodes.size())
+    {
+        return nullptr;
+    }
+
+    return this->input_nodes[index];
+}
+
+std::shared_ptr<Node> Node::getOutputNode(int const index)
+{
+    if(index >= this->output_nodes.size())
+    {
+        return nullptr;
+    }
+
+    return this->output_nodes[index];
+}
 
 COALA_MLP_GRAPH_NODE_TYPE_CODE Node::getNodeType(void)
 {
     return this->type;
 }
+
 int Node::getRank(void)
 {
     return this->rank;
@@ -111,7 +148,6 @@ std::shared_ptr<Node> CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp( COAL
     }
     return nullptr;
 }
-
 
 
 

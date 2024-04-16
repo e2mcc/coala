@@ -43,8 +43,6 @@ class CoalaMlpGraph
     // 用户自定义命名的节点编号
     std::vector<int> user_named_forward_node_ids;
 
-    
-
     public:
     /// @brief 添加计划构建的正向传播图的操作节点
     int addForwardNodeOp(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const user_named_node_id, int const op_func=0);
@@ -60,26 +58,24 @@ class CoalaMlpGraph
 
 
     //--------------------------------------------------------------------
-    // 本图根据用户计划进行正式构建( 通过 activating() 启动 )
+    // 本图根据正向传播图进行正式扩展为完整的计算图 (通过 activating 启动 constructing 和 parallelAnalyzing)
     //--------------------------------------------------------------------
     private:
     int constructing(void);
 
+    std::vector<std::vector<int>> rowparallel_matrix;
+    int parallelAnalyzing(void);
+
     public:
-    void activating(void);
-    
-    
-    
-
-
-
+    int activating(void);
 
     //--------------------------------------------------------------------
     // 执行
     //--------------------------------------------------------------------
     public:
     /// @brief 激活计算图(激活后可进行正反传播计算)
-    
+    void forward(void);
+    void backward(void);
 
 };
 

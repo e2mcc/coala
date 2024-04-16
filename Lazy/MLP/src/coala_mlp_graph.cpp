@@ -187,7 +187,7 @@ int CoalaMlpGraph::updateForwardNodeVa(int const user_named_node_id, COALA_MLP_G
     if(this->node_types[idx] != node_type_code) return 4;
 
     //更新
-    static_cast<Variable*>(this->nodes[idx].get())->setShape(rows, cols);
+    static_cast<Variable*>(this->nodes[idx].get())->setDataShape(rows, cols);
     static_cast<Variable*>(this->nodes[idx].get())->setInitFunc(init_func);
     return 0;
 }
@@ -198,28 +198,209 @@ int CoalaMlpGraph::updateForwardNodeVa(int const user_named_node_id, COALA_MLP_G
 // 正式构建
 //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-//TODO:
 int CoalaMlpGraph::constructing(void)
 {   
-    //将当前所有节点锁定
-    for(int i=0;i<this->nodes.size();i++)
+    int const current_nodes = this->nodes.size();
+    
+    //构建求导节点
+    for(int i=0;i<current_nodes;i++)
+    {
+        if(isOperator(this->nodes[i]->getNodeType()))
+        {
+            Operator * nodeop_rawptr = dynamic_cast<Operator*>(this->nodes[i].get());
+            // Operator
+            switch(this->nodes[i]->getNodeType())
+            {
+                case COALA_MLP_GRAPH_OPERATOR_COST_COMPUTE:
+                    //加入梯度节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_COST_GRAD, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+                    break;
+                
+                
+                
+                case COALA_MLP_GRAPH_OPERATOR_ACTIVATE_COMPUTE:
+                   //加入梯度节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_ACTIVATE_GRAD, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    break;
+                
+                
+                
+                case COALA_MLP_GRAPH_OPERATOR_MATMUL_COMPUTE:
+                    //加入梯度节点1偏导
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD1ST, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+
+                    //加入梯度节点2偏导
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_MATMUL_GRAD2ND, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+
+                    break;
+                
+                
+                case COALA_MLP_GRAPH_OPERATOR_PLUS_COMPUTE:
+                    //加入梯度节点1偏导
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_PLUS_GRAD1ST, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(0).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+
+                    //加入梯度节点2偏导
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeOp(
+                            COALA_MLP_GRAPH_OPERATOR_PLUS_GRAD2ND, nodeop_rawptr->getOpFunc() ) );
+                    //加入输出变量节点
+                    this->nodes.push_back( 
+                        CoalaMlpGraphNodeFactory::createACoalaMlpGraphNodeVa(
+                            COALA_MLP_GRAPH_VARIABLE_ANS, 
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataRows(),
+                            dynamic_cast<Variable*>(nodeop_rawptr->getInputNode(1).get())->getDataCols(),
+                            COALA_MLP_INITIALIZE_ZERO ));
+                    //该输出结果节点不需要求梯度
+                    dynamic_cast<Variable*>(this->nodes[this->nodes.size()-1].get())->setGradRequired(false);
+                    
+                    //连接
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(0));
+                    nodeop_rawptr->getInputNode(0)->setOutputNode(this->nodes[this->nodes.size()-2]);
+
+                    this->nodes[this->nodes.size()-2]->setInputNode(nodeop_rawptr->getInputNode(1));
+                    nodeop_rawptr->getInputNode(1)->setOutputNode(this->nodes[this->nodes.size()-2]);
+                    
+                    this->nodes[this->nodes.size()-2]->setOutputNode(this->nodes[this->nodes.size()-1]);
+                    this->nodes[this->nodes.size()-1]->setInputNode(this->nodes[this->nodes.size()-2]);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
+
+    //将当前所有节点锁定（其实就是正式开数据空间了）
+    for(int i=0;i<current_nodes;i++)
     {
         this->nodes[i]->lockin();
     }
-
-    //构建求导节点
 
     return 0;
 }
 
 
-
-
-void CoalaMlpGraph::activating()
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 并行分析
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+int CoalaMlpGraph::parallelAnalyzing(void)
 {
-    for(int i=0; i<this->nodes.size(); i++)
-    {
-        // this->nodes[i]->activating();
-    }
-    return;
+    return 0;
+}
+
+
+
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 激活
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+int CoalaMlpGraph::activating(void)
+{
+    this->constructing();
+    this->parallelAnalyzing();
 }

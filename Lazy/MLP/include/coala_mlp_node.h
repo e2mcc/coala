@@ -73,7 +73,7 @@ typedef enum
 
 bool isOperator(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
 bool isVariable(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
-
+bool isCompute(COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code);
 //----------------------------------------------------------------------------------------------
 // Node: TypeCode is 0
 //----------------------------------------------------------------------------------------------
@@ -92,6 +92,8 @@ class Node
     std::vector<std::shared_ptr<Node>> output_nodes;
     int setInputNode(std::shared_ptr<Node> const node);
     int setOutputNode(std::shared_ptr<Node> const node);
+    std::shared_ptr<Node> getInputNode(int const index);
+    std::shared_ptr<Node> getOutputNode(int const index);
     COALA_MLP_GRAPH_NODE_TYPE_CODE getNodeType(void);
     int getRank(void);
 

@@ -28,10 +28,11 @@ class Operator : public coala::mlp::Node
     Operator(){}
 
     public:
+    int op_func;
     virtual int lockin() = 0;
-
-    virtual int setOpFunc(int const op_func) = 0;
-
+    void setOpFunc(int const op_func);
+    int getOpFunc(void);
+    
     
 };
 
@@ -48,7 +49,6 @@ class OperatorCost : public Operator
 
     public:
     virtual int lockin() = 0;
-    virtual int setOpFunc(int const op_func) = 0;
 };
 
 // Node Operator Cost Compute: TypeCode is 10100
@@ -59,11 +59,7 @@ class OperatorCostCompute : public OperatorCost
 
     public:
     OperatorCostCompute(COALA_MLP_COST const costfunc);
-    int setOpFunc(int const op_func) override;
     int lockin() override;
-    
-    private:
-    int costfunc;
 };
 
 // Node Operator Cost Grad: TypeCode is 10101
@@ -74,11 +70,8 @@ class OperatorCostGrad : public OperatorCost
 
     public:
     OperatorCostGrad(COALA_MLP_COST const costfunc);
-    int setOpFunc(int const op_func) override;
     int lockin() override;
 
-    private:
-    int costfunc;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -91,7 +84,6 @@ class OperatorActivate : public Operator
     
     public:
     virtual int lockin() = 0;
-    virtual int setOpFunc(int const op_func) = 0;
     
    
 };
@@ -104,11 +96,8 @@ class OperatorActivateCompute : public OperatorActivate
 
     public:
     OperatorActivateCompute(COALA_MLP_ACTIVATE_FUNC const activatefunc);
-    int setOpFunc(int const op_func) override;
     int lockin() override;
 
-    private:
-    int activatefunc;
 };
 
 // Node Operator Activate Grad: TypeCode is 10201
@@ -119,11 +108,8 @@ class OperatorActivateGrad : public OperatorActivate
 
     public:
     OperatorActivateGrad(COALA_MLP_ACTIVATE_FUNC const activatefunc);
-    int setOpFunc(int const op_func) override;
     int lockin() override;
 
-    private:
-    int activatefunc;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -145,7 +131,6 @@ class OperatorPlusCompute : public OperatorPlus
 {
     public:
     OperatorPlusCompute(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 
 };
@@ -155,7 +140,6 @@ class OperatorPlusGrad1st : public OperatorPlus
 {
     public:
     OperatorPlusGrad1st(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 };
 
@@ -164,7 +148,6 @@ class OperatorPlusGrad2nd : public OperatorPlus
 {
     public:
     OperatorPlusGrad2nd(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 
 };
@@ -179,7 +162,6 @@ class OperatorMatmul : public Operator
 
     public:
     virtual int lockin() = 0;
-    virtual int setOpFunc(int const op_func) = 0;
     
 };
 
@@ -189,7 +171,6 @@ class OperatorMatmulCompute : public OperatorMatmul
 {
     public:
     OperatorMatmulCompute(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 };
 
@@ -198,7 +179,6 @@ class OperatorMatmulGrad1st : public OperatorMatmul
 {
     public:
     OperatorMatmulGrad1st(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 };
 
@@ -207,7 +187,6 @@ class OperatorMatmulGrad2nd : public OperatorMatmul
 {
     public:
     OperatorMatmulGrad2nd(){}
-    int setOpFunc(int const op_func) override {return 0;}
     int lockin() override;
 };
 
