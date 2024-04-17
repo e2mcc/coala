@@ -193,7 +193,54 @@ int CoalaMlpGraph::updateForwardNodeVa(int const user_named_node_id, COALA_MLP_G
 }
 
 
+int CoalaMlpGraph::setInputXId(int const user_named_node_id)
+{
+    if(user_named_node_id<0) return 1;
+    // 检查用户是否已经添加了这个id名
+    int idx = -1;
+    for(int i=0; i<this->user_named_forward_node_ids.size(); i++)
+    {
+        if(this->user_named_forward_node_ids[i] == user_named_node_id) idx = i;
+    }
+    if(idx<0) return 2;
 
+    if(this->nodes[idx]->getNodeType() != COALA_MLP_GRAPH_VARIABLE_INPUT) return 3;
+
+    this->inputX_id = idx;
+}
+
+int CoalaMlpGraph::setInputYId(int const user_named_node_id)
+{
+    
+    if(user_named_node_id<0) return 1;
+    // 检查用户是否已经添加了这个id名
+    int idx = -1;
+    for(int i=0; i<this->user_named_forward_node_ids.size(); i++)
+    {
+        if(this->user_named_forward_node_ids[i] == user_named_node_id) idx = i;
+    }
+    if(idx<0) return 2;
+
+    if(this->nodes[idx]->getNodeType() != COALA_MLP_GRAPH_VARIABLE_INPUT) return 3;
+
+    this->inputY_id = idx;
+}
+
+int CoalaMlpGraph::setLossId(int const user_named_node_id)
+{
+    if(user_named_node_id<0) return 1;
+    // 检查用户是否已经添加了这个id名
+    int idx = -1;
+    for(int i=0; i<this->user_named_forward_node_ids.size(); i++)
+    {
+        if(this->user_named_forward_node_ids[i] == user_named_node_id) idx = i;
+    }
+    if(idx<0) return 2;
+
+    if(this->nodes[idx]->getNodeType() != COALA_MLP_GRAPH_VARIABLE_ANS) return 3;
+
+    this->inputY_id = idx;
+}
 //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // 正式构建
 //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -404,3 +451,19 @@ int CoalaMlpGraph::activating(void)
     this->constructing();
     this->parallelAnalyzing();
 }
+
+
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 执行
+//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+ void CoalaMlpGraph::forward(void)
+ {
+    return;
+ }
+
+
+
+ void CoalaMlpGraph::backward(void)
+ {
+    return;
+ }

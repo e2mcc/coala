@@ -113,6 +113,13 @@ CoalaMLP::CoalaMLP(int const input_layer_neurons, int const hidden_layers_count=
     this->graph->addForwardNodeVa(COALA_MLP_GRAPH_VARIABLE_ANS, 8*this->hidden_layers_count+11, 1,1);
     this->graph->addForwardEdge(8*this->hidden_layers_count+9, 8*this->hidden_layers_count+11);
 
+
+    //---------------------------------------------------------------------
+    //标记输入节点与输出节点
+    //---------------------------------------------------------------------
+    this->graph->setInputX(0);
+    this->graph->setInputY(8*this->hidden_layers_count+10);
+
     return;
 }
 

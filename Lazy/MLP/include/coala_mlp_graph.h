@@ -35,11 +35,14 @@ class CoalaMlpGraph
     // 节点类型
     std::vector<COALA_MLP_GRAPH_NODE_TYPE_CODE> node_types;
 
+    int inputX_id;
+    int inputY_id;
+    int loss_id;
+
     //--------------------------------------------------------------------
     // 用户: 计划构建
     //--------------------------------------------------------------------
     private:
-    
     // 用户自定义命名的节点编号
     std::vector<int> user_named_forward_node_ids;
 
@@ -56,6 +59,10 @@ class CoalaMlpGraph
     /// @brief 更新计划构建的正向传播图的变量节点
     int updateForwardNodeVa(int const user_named_node_id, COALA_MLP_GRAPH_NODE_TYPE_CODE const node_type_code, int const rows, int const cols, COALA_MLP_INITIALIZE_FUNC const init_func=COALA_MLP_INITIALIZE_ZERO);
 
+    ///
+    int setInputXId(int const user_named_node_id);
+    int setInputYId(int const user_named_node_id);
+    int setLossId(int const user_named_node_id);
 
     //--------------------------------------------------------------------
     // 本图根据正向传播图进行正式扩展为完整的计算图 (通过 activating 启动 constructing 和 parallelAnalyzing)
